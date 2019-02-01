@@ -1,7 +1,12 @@
 const puppeteer = require("puppeteer");
 
-const getRandomAwaitTime = () =>
-  Math.floor(Math.random() * (2000 - 1000) + 1000);
+let playersBuyed = 0;
+const playerName = "Laurence Bilboe";
+const playerQuality = "";
+const maxBuyNowPrice = 250;
+const playersToBuy = 2;
+
+const getRandomAwaitTime = () => Math.floor(Math.random() * (1500 - 500) + 500);
 
 const goToMarketTab = async page => {
   await page.waitFor(getRandomAwaitTime());
@@ -11,7 +16,7 @@ const goToMarketTab = async page => {
   );
 
   if (transferMarketTabButton.length > 0) {
-    transferMarketTabButton[0].click();
+    await transferMarketTabButton[0].click();
   } else {
     console.log("No transfer tab found");
     await browser.close();
@@ -26,7 +31,7 @@ const goToMarket = async page => {
   );
 
   if (goToMarketButton.length > 0) {
-    goToMarketButton[0].click();
+    await goToMarketButton[0].click();
   } else {
     console.log("No transfer button found");
     await browser.close();
@@ -46,14 +51,14 @@ const typePlayerOnInput = async (page, playerName) => {
 };
 
 const selectPlayer = async (page, playerName) => {
-  await page.waitFor(getRandomAwaitTime() * 2);
+  await page.waitFor(getRandomAwaitTime() * 1.5);
 
   const playerButton = await page.$x(
     `//span[contains(text(), "${playerName}")]`
   );
 
   if (playerButton.length > 0) {
-    playerButton[0].click();
+    await playerButton[0].click();
   } else {
     console.log("Player name not found", playerButton);
   }
@@ -65,19 +70,22 @@ const searchPlayer = async page => {
   const searchButton = await page.$x("//button[contains(text(), 'Search')]");
 
   if (searchButton.length > 0) {
-    searchButton[0].click();
+    await searchButton[0].click();
   } else {
     console.log("No search button found");
   }
 };
 
-const changeQuality = async (page, quality = "Special") => {
+const changeQuality = async (page, quality) => {
+  if (!quality) {
+    return;
+  }
   await page.waitFor(getRandomAwaitTime());
 
   const qualityButton = await page.$x("//span[contains(text(), 'Quality')]");
 
   if (qualityButton.length > 0) {
-    qualityButton[0].click();
+    await qualityButton[0].click();
   } else {
     console.log("No quality button found");
   }
@@ -89,7 +97,7 @@ const changeQuality = async (page, quality = "Special") => {
   );
 
   if (qualityOptionButton.length > 0) {
-    qualityOptionButton[0].click();
+    await qualityOptionButton[0].click();
   } else {
     console.log("No quality option button found");
   }
@@ -109,7 +117,7 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
 
   maxBuyNowPriceButton.click();
 
-  await page.waitFor(250);
+  await page.waitFor(200);
 
   await maxBuyNowPriceButton.type(String(maxPrice), {
     delay: 80
@@ -125,7 +133,72 @@ const isNoResultBanner = async page => {
 };
 
 const clickBackButtonToMartket = async page => {
+  await page.$(".btn-navigation");
   await page.click(".btn-navigation");
+};
+
+const buyPlayer = async page => {
+  const players = await page.$$(".listFUTItem");
+  const lastPlayer = players[players.length - 1];
+
+  await lastPlayer.click();
+
+  await page.waitFor(200);
+
+  await page.click(".buyButton");
+
+  await page.waitFor(180);
+
+  const confirmBuyButtom = await page.$x(`//button[contains(text(), "Ok")]`);
+
+  if (confirmBuyButtom.length > 0) {
+    console.log("Buy");
+    await confirmBuyButtom[0].click();
+
+    // Check bid status (win or lose)
+    await Promise.race([page.waitFor(".expired"), page.waitFor(".won")]);
+
+    const playerWon = await page.$(".won");
+
+    return !!playerWon;
+  } else {
+    console.log("Confirm buy button nor found", confirmBuyButtom);
+    return false;
+  }
+};
+
+const buyAllPlayer = async (page, playersToBuy) => {
+  await page.waitFor(244);
+  await searchPlayer(page);
+
+  await Promise.race([
+    page.waitFor(".listFUTItem"),
+    page.waitForXPath("//h2[contains(text(), 'No results found')]")
+  ]);
+
+  const isPlayerNotFound = await isNoResultBanner(page);
+
+  if (isPlayerNotFound) {
+    await clickBackButtonToMartket(page);
+    await page.waitFor(355);
+    await buyAllPlayer(page, playersToBuy);
+  } else {
+    const isPlayerBuyed = await buyPlayer(page);
+
+    if (isPlayerBuyed) {
+      playersBuyed++;
+    }
+
+    if (playersBuyed === playersToBuy) {
+      console.log(`You have buyed ${playersBuyed} players`);
+      return process.exit(0);
+    }
+
+    await clickBackButtonToMartket(page);
+    await page.waitFor(355);
+
+    await buyAllPlayer(page, playersToBuy);
+  }
 };
 
 (async () => {
@@ -152,10 +225,6 @@ const clickBackButtonToMartket = async page => {
     return;
   }
 
-  const playerName = "Armando Izzo";
-  const playerQuality = "Special";
-  const maxBuyNowPrice = 12000;
-
   await goToMarketTab(page);
   await goToMarket(page);
 
@@ -166,15 +235,7 @@ const clickBackButtonToMartket = async page => {
 
   await setMaxBuyNowPrice(page, maxBuyNowPrice);
 
-  await searchPlayer(page);
-
-  await page.waitFor(300);
-
-  const isPlayerNotFound = await isNoResultBanner(page);
-
-  if (isPlayerNotFound) {
-    await clickBackButtonToMartket(page);
-  }
+  await buyAllPlayer(page, playersToBuy);
 
   //   await page.screenshot({ path: "example1.png" });
 })();
