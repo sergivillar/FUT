@@ -1,39 +1,154 @@
 const puppeteer = require("puppeteer");
-const config = require("./config.json");
 
-if (config.email || config.password) {
-  throw new Error(
-    "You should create your config.json file and provide your email and password"
-  );
-}
+const getRandomAwaitTime = () =>
+  Math.floor(Math.random() * (2000 - 1000) + 1000);
 
-const emailInputId = "email";
-const passwordInputId = "password";
+const goToMarketTab = async page => {
+  await page.waitFor(getRandomAwaitTime());
 
-(async () => {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  await page.goto("https://www.easports.com/fifa/ultimate-team/web-app/");
-  await page.waitFor(() =>
-    [...document.querySelectorAll("button")].some(i => i.innerText === "Login")
+  const transferMarketTabButton = await page.$x(
+    "//button[contains(text(), 'Transfers')]"
   );
 
-  // TODO add a random here
-  await page.waitFor(1500);
-
-  const loginButton = await page.$x("//button[contains(text(), 'Login')]");
-
-  if (loginButton.length > 0) {
-    loginButton[0].click();
+  if (transferMarketTabButton.length > 0) {
+    transferMarketTabButton[0].click();
   } else {
-    console.log("No login found");
+    console.log("No transfer tab found");
     await browser.close();
   }
+};
 
-  await page.waitFor(5000);
+const goToMarket = async page => {
+  await page.waitFor(getRandomAwaitTime());
 
-  await page.type(`input[id=${emailInputId}]`, "user", { delay: 100 });
-  await page.type(`input[id=${passwordInputId}]`, "password", { delay: 120 });
+  const goToMarketButton = await page.$x(
+    "//h1[contains(text(), 'Search the Transfer Market')]"
+  );
 
-  await page.screenshot({ path: "example.png" });
+  if (goToMarketButton.length > 0) {
+    goToMarketButton[0].click();
+  } else {
+    console.log("No transfer button found");
+    await browser.close();
+  }
+};
+
+const typePlayerOnInput = async (page, playerName) => {
+  await page.waitFor(getRandomAwaitTime());
+
+  await page.click('input[placeholder="Type Player Name"]');
+
+  await page.waitFor(500);
+
+  await page.type('input[placeholder="Type Player Name"]', playerName, {
+    delay: 80
+  });
+};
+
+const selectPlayer = async (page, playerName) => {
+  await page.waitFor(getRandomAwaitTime() * 2);
+
+  const playerButton = await page.$x(
+    `//span[contains(text(), "${playerName}")]`
+  );
+
+  if (playerButton.length > 0) {
+    playerButton[0].click();
+  } else {
+    console.log("Player name not found", playerButton);
+  }
+};
+
+const searchPlayer = async page => {
+  await page.waitFor(getRandomAwaitTime());
+
+  const searchButton = await page.$x("//button[contains(text(), 'Search')]");
+
+  if (searchButton.length > 0) {
+    searchButton[0].click();
+  } else {
+    console.log("No search button found");
+  }
+};
+
+const changeQuality = async (page, quality = "Special") => {
+  await page.waitFor(getRandomAwaitTime());
+
+  const qualityButton = await page.$x("//span[contains(text(), 'Quality')]");
+
+  if (qualityButton.length > 0) {
+    qualityButton[0].click();
+  } else {
+    console.log("No quality button found");
+  }
+
+  await page.waitFor(500);
+
+  const qualityOptionButton = await page.$x(
+    `//span[contains(text(), '${quality}')]`
+  );
+
+  if (qualityOptionButton.length > 0) {
+    qualityOptionButton[0].click();
+  } else {
+    console.log("No quality option button found");
+  }
+};
+
+const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
+  await page.waitFor(getRandomAwaitTime());
+
+  const valueInputs = await page.$$(".numericInput");
+
+  if (valueInputs !== 4) {
+    console.log("There's no money inputs. Somthing went wrong");
+    return;
+  }
+
+  valueInputs[3].type('input[placeholder="Type Player Name"]', maxPrice, {
+    delay: 80
+  });
+};
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: [`--user-data-dir=tmp/chrome-data`]
+  });
+
+  const page = await browser.newPage();
+  await page.goto("https://www.easports.com/fifa/ultimate-team/web-app/");
+
+  let isUserLogged = false;
+  try {
+    await page.waitForXPath("//button[contains(text(), 'Transfers')]", {
+      timeout: 15000
+    });
+    isUserLogged = true;
+  } catch (e) {
+    console.log("You need to login manually and restart the script after that");
+    return;
+  }
+
+  if (!isUserLogged) {
+    return;
+  }
+
+  const playerName = "Armando Izzo";
+  const playerQuality = null;
+  const maxBuyNowPrice = 12000;
+
+  await goToMarketTab(page);
+  await goToMarket(page);
+
+  await typePlayerOnInput(page, playerName);
+  await selectPlayer(page, playerName);
+
+  await changeQuality(page, playerQuality);
+
+  await setMaxBuyNowPrice(page, maxBuyNowPrice);
+
+  await searchPlayer(page);
+
+  //   await page.screenshot({ path: "example1.png" });
 })();
