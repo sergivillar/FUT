@@ -4,9 +4,10 @@ let playersBuyed = 0;
 const playerName = "Laurence Bilboe";
 const playerQuality = "";
 const maxBuyNowPrice = 250;
-const playersToBuy = 2;
+const playersToBuy = 3;
 
-const getRandomAwaitTime = () => Math.floor(Math.random() * (1500 - 500) + 500);
+const getRandomAwaitTime = (min = 500, max = 1500) =>
+  Math.floor(Math.random() * (max - min) + min);
 
 const goToMarketTab = async page => {
   await page.waitFor(getRandomAwaitTime());
@@ -139,7 +140,8 @@ const clickBackButtonToMartket = async page => {
 
 const buyPlayer = async page => {
   const players = await page.$$(".listFUTItem");
-  const lastPlayer = players[players.length - 1];
+  const lastPlayer =
+    players[Math.floor(Math.random() * (players.length - 0) + 0)];
 
   await lastPlayer.click();
 
@@ -158,6 +160,16 @@ const buyPlayer = async page => {
     // Check bid status (win or lose)
     await Promise.race([page.waitFor(".expired"), page.waitFor(".won")]);
 
+    const errorStatus = await page.$x(
+      `//p[contains(text(), "Bid status changed, auction data will be updated.")]`
+    );
+
+    if (errorStatus.length > 0) {
+      console.log("Status out of date");
+      await page.waitFor(150);
+      return false;
+    }
+
     const playerWon = await page.$(".won");
 
     return !!playerWon;
@@ -168,7 +180,7 @@ const buyPlayer = async page => {
 };
 
 const buyAllPlayer = async (page, playersToBuy) => {
-  await page.waitFor(244);
+  await page.waitFor(getRandomAwaitTime(200, 300));
   await searchPlayer(page);
 
   await Promise.race([
@@ -180,7 +192,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
 
   if (isPlayerNotFound) {
     await clickBackButtonToMartket(page);
-    await page.waitFor(355);
+    await page.waitFor(getRandomAwaitTime(200, 300));
     await buyAllPlayer(page, playersToBuy);
   } else {
     const isPlayerBuyed = await buyPlayer(page);
@@ -195,7 +207,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
     }
 
     await clickBackButtonToMartket(page);
-    await page.waitFor(355);
+    await page.waitFor(getRandomAwaitTime(200, 300));
 
     await buyAllPlayer(page, playersToBuy);
   }
