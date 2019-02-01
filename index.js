@@ -85,7 +85,7 @@ const changeQuality = async (page, quality = "Special") => {
   await page.waitFor(500);
 
   const qualityOptionButton = await page.$x(
-    `//span[contains(text(), '${quality}')]`
+    `//li[contains(text(), '${quality}')]`
   );
 
   if (qualityOptionButton.length > 0) {
@@ -100,14 +100,32 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
 
   const valueInputs = await page.$$(".numericInput");
 
-  if (valueInputs !== 4) {
+  if (valueInputs.length !== 4) {
     console.log("There's no money inputs. Somthing went wrong");
     return;
   }
 
-  valueInputs[3].type('input[placeholder="Type Player Name"]', maxPrice, {
+  const maxBuyNowPriceButton = valueInputs[3];
+
+  maxBuyNowPriceButton.click();
+
+  await page.waitFor(250);
+
+  await maxBuyNowPriceButton.type(String(maxPrice), {
     delay: 80
   });
+};
+
+const isNoResultBanner = async page => {
+  const noResultBanner = await page.$x(
+    "//h2[contains(text(), 'No results found')]"
+  );
+
+  return !!noResultBanner.length;
+};
+
+const clickBackButtonToMartket = async page => {
+  await page.click(".btn-navigation");
 };
 
 (async () => {
@@ -135,7 +153,7 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
   }
 
   const playerName = "Armando Izzo";
-  const playerQuality = null;
+  const playerQuality = "Special";
   const maxBuyNowPrice = 12000;
 
   await goToMarketTab(page);
@@ -149,6 +167,14 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
   await setMaxBuyNowPrice(page, maxBuyNowPrice);
 
   await searchPlayer(page);
+
+  await page.waitFor(300);
+
+  const isPlayerNotFound = await isNoResultBanner(page);
+
+  if (isPlayerNotFound) {
+    await clickBackButtonToMartket(page);
+  }
 
   //   await page.screenshot({ path: "example1.png" });
 })();
