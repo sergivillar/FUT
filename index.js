@@ -1,10 +1,13 @@
 const puppeteer = require("puppeteer");
 
+const MAX_NUMBER_ITERATIONS = 50;
 let playersBuyed = 0;
-const playerName = "Laurence Bilboe";
-const playerQuality = "";
-const maxBuyNowPrice = 250;
-const playersToBuy = 3;
+let iteration = 0;
+const playerName = "Joan Jordán";
+const playerQuality = "Special";
+const playerMedia = 84;
+const maxBuyNowPrice = 21000;
+const playersToBuy = 1;
 
 const getRandomAwaitTime = (min = 500, max = 1500) =>
   Math.floor(Math.random() * (max - min) + min);
@@ -66,15 +69,10 @@ const selectPlayer = async (page, playerName) => {
 };
 
 const searchPlayer = async page => {
-  await page.waitFor(getRandomAwaitTime());
-
-  const searchButton = await page.$x("//button[contains(text(), 'Search')]");
-
-  if (searchButton.length > 0) {
-    await searchButton[0].click();
-  } else {
-    console.log("No search button found");
-  }
+  const searchButton = await page.waitForXPath(
+    "//button[contains(text(), 'Search')]"
+  );
+  await searchButton.asElement().click();
 };
 
 const changeQuality = async (page, quality) => {
@@ -134,12 +132,20 @@ const isNoResultBanner = async page => {
 };
 
 const clickBackButtonToMartket = async page => {
+  await page.waitFor(200);
   await page.$(".btn-navigation");
   await page.click(".btn-navigation");
 };
 
 const buyPlayer = async page => {
-  const players = await page.$$(".listFUTItem");
+  const players = !!playerMedia
+    ? await page.$$(".listFUTItem")
+    : await page.$x(
+        $x(
+          `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerMedia})]]`
+        )
+      );
+
   const lastPlayer =
     players[Math.floor(Math.random() * (players.length - 0) + 0)];
 
@@ -180,7 +186,14 @@ const buyPlayer = async page => {
 };
 
 const buyAllPlayer = async (page, playersToBuy) => {
-  await page.waitFor(getRandomAwaitTime(200, 300));
+  console.log(`Attempt number ${iteration++}`);
+
+  if (iteration > MAX_NUMBER_ITERATIONS) {
+    console.log("Max. number of iterations exceeded ", MAX_NUMBER_ITERATIONS);
+    return process.exit(0);
+  }
+
+  await page.waitFor(getRandomAwaitTime(300, 400));
   await searchPlayer(page);
 
   await Promise.race([
