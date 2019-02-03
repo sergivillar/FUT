@@ -31,16 +31,10 @@ const goToMarketTab = async page => {
 const goToMarket = async page => {
   await page.waitFor(getRandomAwaitTime());
 
-  const goToMarketButton = await page.$x(
+  const goToMarketButton = await page.waitForXPath(
     "//h1[contains(text(), 'Search the Transfer Market')]"
   );
-
-  if (goToMarketButton.length > 0) {
-    await goToMarketButton[0].click();
-  } else {
-    console.log("No transfer button found");
-    await browser.close();
-  }
+  await goToMarketButton.asElement().click();
 };
 
 const typePlayerOnInput = async (page, playerName) => {
@@ -58,15 +52,10 @@ const typePlayerOnInput = async (page, playerName) => {
 const selectPlayer = async (page, playerName) => {
   await page.waitFor(getRandomAwaitTime() * 1.5);
 
-  const playerButton = await page.$x(
+  const selectPlayerButton = await page.waitForXPath(
     `//span[contains(text(), "${playerName}")]`
   );
-
-  if (playerButton.length > 0) {
-    await playerButton[0].click();
-  } else {
-    console.log("Player name not found", playerButton);
-  }
+  await selectPlayerButton.asElement().click();
 };
 
 const searchPlayer = async page => {
@@ -77,30 +66,19 @@ const searchPlayer = async page => {
 };
 
 const changeQuality = async (page, quality) => {
-  if (!quality) {
-    return;
-  }
   await page.waitFor(getRandomAwaitTime());
 
-  const qualityButton = await page.$x("//span[contains(text(), 'Quality')]");
-
-  if (qualityButton.length > 0) {
-    await qualityButton[0].click();
-  } else {
-    console.log("No quality button found");
-  }
+  const qualityButton = await page.waitForXPath(
+    "//span[contains(text(), 'Quality')]"
+  );
+  await qualityButton.asElement().click();
 
   await page.waitFor(500);
 
-  const qualityOptionButton = await page.$x(
+  const qualityOptionButton = await page.waitForXPath(
     `//li[contains(text(), '${quality}')]`
   );
-
-  if (qualityOptionButton.length > 0) {
-    await qualityOptionButton[0].click();
-  } else {
-    console.log("No quality option button found");
-  }
+  await qualityOptionButton.asElement().click();
 };
 
 const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
@@ -160,11 +138,11 @@ const clickBackButtonToMartket = async page => {
 };
 
 const buyPlayer = async page => {
-  const players = !!playerMedia
+  const players = !playerMedia
     ? await page.$$(".listFUTItem")
     : await page.$x(
         $x(
-          `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerMedia})]]`
+          `//li[contains(@class, "listFUTItem") and .//div[contains(text() , "${playerMedia}")]]`
         )
       );
 
@@ -224,10 +202,10 @@ const buyAllPlayer = async (page, playersToBuy) => {
   ]);
 
   const isPlayerNotFound = await isNoResultBanner(page);
+  await page.waitFor(getRandomAwaitTime(250, 350));
 
   if (isPlayerNotFound) {
     await clickBackButtonToMartket(page);
-    await page.waitFor(getRandomAwaitTime(200, 300));
     await buyAllPlayer(page, playersToBuy);
   } else {
     const isPlayerBuyed = await buyPlayer(page);
@@ -242,7 +220,6 @@ const buyAllPlayer = async (page, playersToBuy) => {
     }
 
     await clickBackButtonToMartket(page);
-    await page.waitFor(getRandomAwaitTime(200, 300));
 
     await buyAllPlayer(page, playersToBuy);
   }
@@ -278,10 +255,16 @@ const buyAllPlayer = async (page, playersToBuy) => {
   await typePlayerOnInput(page, playerName);
   await selectPlayer(page, playerName);
 
-  await changeQuality(page, playerQuality);
+  if (!!playerQuality) {
+    await changeQuality(page, playerQuality);
+  }
 
-  await setMinBuyNowPrice(page, minBuyNowPrice);
-  await setMaxBuyNowPrice(page, maxBuyNowPrice);
+  if (!!minBuyNowPrice) {
+    await setMinBuyNowPrice(page, minBuyNowPrice);
+  }
+  if (!!maxBuyNowPrice) {
+    await setMaxBuyNowPrice(page, maxBuyNowPrice);
+  }
 
   await buyAllPlayer(page, playersToBuy);
 
