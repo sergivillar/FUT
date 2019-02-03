@@ -7,6 +7,7 @@ const playerName = "Joan Jordán";
 const playerQuality = "Special";
 const playerMedia = 84;
 const maxBuyNowPrice = 21000;
+const minBuyNowPrice = 0;
 const playersToBuy = 1;
 
 const getRandomAwaitTime = (min = 500, max = 1500) =>
@@ -119,6 +120,27 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
   await page.waitFor(200);
 
   await maxBuyNowPriceButton.type(String(maxPrice), {
+    delay: 80
+  });
+};
+
+const setMinBuyNowPrice = async (page, minPrice = 0) => {
+  await page.waitFor(getRandomAwaitTime());
+
+  const valueInputs = await page.$$(".numericInput");
+
+  if (valueInputs.length !== 4) {
+    console.log("There's no money inputs. Somthing went wrong");
+    return;
+  }
+
+  const minBuyNowPriceButton = valueInputs[2];
+
+  minBuyNowPriceButton.click();
+
+  await page.waitFor(200);
+
+  await minBuyNowPriceButton.type(String(minPrice), {
     delay: 80
   });
 };
@@ -258,6 +280,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
 
   await changeQuality(page, playerQuality);
 
+  await setMinBuyNowPrice(page, minBuyNowPrice);
   await setMaxBuyNowPrice(page, maxBuyNowPrice);
 
   await buyAllPlayer(page, playersToBuy);
