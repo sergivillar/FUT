@@ -1,7 +1,10 @@
 const puppeteer = require("puppeteer");
+const chalk = require("chalk");
+const ProgressBar = require("./progress-bar");
 
 const MAX_NUMBER_ITERATIONS = 70;
 let playersBuyed = 0;
+let playerLost = 0;
 let iteration = 0;
 const playerName = "Omar Mascarell";
 const playerQuality = "";
@@ -10,34 +13,43 @@ const maxBuyNowPrice = 400;
 const minBuyNowPrice = 0;
 const playersToBuy = 3;
 
+const Bar = new ProgressBar();
 const getRandomAwaitTime = (min = 500, max = 1500) =>
   Math.floor(Math.random() * (max - min) + min);
 
 const goToMarketTab = async page => {
-  console.log("Go to market section");
   await page.waitFor(getRandomAwaitTime());
 
-  const transferMarketTabButton = await page.$x(
+  const transferMarketTabButton = await page.waitForXPath(
     "//button[contains(text(), 'Transfers')]"
   );
+  await transferMarketTabButton.asElement().click();
+  await page.waitFor(getRandomAwaitTime(250, 350));
 
-  if (transferMarketTabButton.length > 0) {
-    await transferMarketTabButton[0].click();
-  } else {
-    console.log("No transfer tab found");
-    await browser.close();
+  const checkTransferPageLoaded = await page.$x(
+    "//h1[contains(text(), 'Search the Transfer Market')]"
+  );
+
+  if (checkTransferPageLoaded.length === 0) {
+    await goToMarketTab(page);
   }
 };
 
 const goToMarket = async page => {
-  console.log("Go to market");
-  // TODO, sometimes this does not works
   await page.waitFor(getRandomAwaitTime());
 
   const goToMarketButton = await page.waitForXPath(
     "//h1[contains(text(), 'Search the Transfer Market')]"
   );
   await goToMarketButton.asElement().click();
+
+  const checkMarketPageLoaded = await page.$(
+    'input[placeholder="Type Player Name"]'
+  );
+
+  if (!checkMarketPageLoaded) {
+    await goToMarket(page);
+  }
 };
 
 const typePlayerOnInput = async (page, playerName) => {
@@ -161,7 +173,6 @@ const buyPlayer = async page => {
   const confirmBuyButtom = await page.$x(`//button[contains(text(), "Ok")]`);
 
   if (confirmBuyButtom.length > 0) {
-    console.log("Try to buy");
     await confirmBuyButtom[0].click();
 
     // Check bid status (win or lose)
@@ -172,7 +183,7 @@ const buyPlayer = async page => {
     );
 
     if (errorStatus.length > 0) {
-      console.log("Status out of date");
+      playerLost++;
       await page.waitFor(150);
       return false;
     }
@@ -187,11 +198,17 @@ const buyPlayer = async page => {
 };
 
 const buyAllPlayer = async (page, playersToBuy) => {
-  console.log(`Attempt number ${iteration++}`);
+  Bar.update(iteration++);
 
   if (iteration > MAX_NUMBER_ITERATIONS) {
-    console.log("Max. number of iterations exceeded ", MAX_NUMBER_ITERATIONS);
-    console.log("Total players buyed :", playersBuyed);
+    console.log("\n\n");
+    console.log(
+      chalk.blue("💸 Iteratios end. Attempts: ", MAX_NUMBER_ITERATIONS)
+    );
+    console.log(chalk.green("🔥 Total players buyed :", playersBuyed));
+    console.log(
+      chalk.red("🐀 Total players stolen by a rat kid :", playerLost)
+    );
     return process.exit(0);
   }
 
@@ -217,7 +234,16 @@ const buyAllPlayer = async (page, playersToBuy) => {
     }
 
     if (playersBuyed === playersToBuy) {
-      console.log(`You have buyed ${playersBuyed} players`);
+      console.log("\n\n");
+      console.log(
+        chalk.blue(
+          `💸 All players neede buyed in ${MAX_NUMBER_ITERATIONS} attempts: `
+        )
+      );
+      console.log(chalk.green("🔥 Total players buyed :", playersBuyed));
+      console.log(
+        chalk.red("🐀 Total players stolen by a rat kid :", playerLost)
+      );
       return process.exit(0);
     }
 
@@ -245,6 +271,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
     return;
   }
 
+  console.log("🚀 Start hunting. Number of attempts: ", MAX_NUMBER_ITERATIONS);
   await goToMarketTab(page);
   await goToMarket(page);
 
@@ -262,6 +289,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
     await setMaxBuyNowPrice(page, maxBuyNowPrice);
   }
 
+  Bar.init(MAX_NUMBER_ITERATIONS);
   await buyAllPlayer(page, playersToBuy);
 
   //   await page.screenshot({ path: "example1.png" });
