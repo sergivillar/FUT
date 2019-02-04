@@ -242,7 +242,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
     });
   } catch (e) {
     console.log("You need to login manually and restart the script after that");
-    return process.exit(0);
+    return;
   }
 
   await goToMarketTab(page);
