@@ -73,6 +73,48 @@ const setMinBuyNowPrice = async (page, minPrice = 0) => {
     });
 };
 
+const setMaxBidPrice = async (page, maxPrice = 0) => {
+    await page.waitFor(getRandomAwaitTime());
+
+    const valueInputs = await page.$$('.numericInput');
+
+    if (valueInputs.length !== 4) {
+        console.log('There is no money inputs. Somthing went wrong');
+        return;
+    }
+
+    const maxBidPriceButton = valueInputs[1];
+
+    maxBidPriceButton.click();
+
+    await page.waitFor(200);
+
+    await maxBidPriceButton.type(String(maxPrice), {
+        delay: 80,
+    });
+};
+
+const setMinBidPrice = async (page, minPrice = 0) => {
+    await page.waitFor(getRandomAwaitTime());
+
+    const valueInputs = await page.$$('.numericInput');
+
+    if (valueInputs.length !== 4) {
+        console.log('There is no money inputs. Somthing went wrong');
+        return;
+    }
+
+    const minBidPriceButton = valueInputs[0];
+
+    minBidPriceButton.click();
+
+    await page.waitFor(200);
+
+    await minBidPriceButton.type(String(minPrice), {
+        delay: 80,
+    });
+};
+
 const searchPlayer = async page => {
     const searchButton = await page.waitForXPath('//button[contains(text(), "Search")]');
     await searchButton.asElement().click();
@@ -83,6 +125,8 @@ module.exports = {
     selectPlayer,
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
+    setMinBidPrice,
+    setMaxBidPrice,
     changeQuality,
     searchPlayer,
 };
