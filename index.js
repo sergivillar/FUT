@@ -2,16 +2,18 @@ const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const ProgressBar = require('./src/progress-bar');
 const {getRandomAwaitTime} = require('./src/utils');
-const {goToMarketSection, goToMarket, clickBackButton} = require('./src/navigaton');
+const {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} = require('./src/navigaton');
 const {
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
+    setMinBidPrice,
+    setMaxBidPrice,
     changeQuality,
     typePlayerOnInput,
     selectPlayer,
     searchPlayer,
 } = require('./src/market-section');
-const {isNoResultBanner, buyPlayer} = require('./src/market-players');
+const {isNoResultBanner, buyPlayer, bidPlayer} = require('./src/market-players');
 
 const MAX_NUMBER_ITERATIONS = 200;
 
@@ -22,8 +24,12 @@ let iteration = 0;
 const playerName = 'Jasper Cillessen';
 const playerQuality = 'Special';
 const playerMedia = 84;
-const minBuyNowPrice = 11000;
-const maxBuyNowPrice = 15500;
+const minBuyNowPrice = 0;
+const minBidPrice = 10000;
+const maxBidPrice = 15500;
+const maxBuyNowPrice = 0;
+const maxExpirationTime = 600; // Seconds
+const maxActiveBids = 2;
 const playersToBuy = 1;
 
 const Bar = new ProgressBar();
@@ -76,6 +82,50 @@ const buyAllPlayer = async (page, playersToBuy) => {
     }
 };
 
+const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
+    await page.waitFor(getRandomAwaitTime(300, 400));
+    await searchPlayer(page);
+
+    await Promise.race([
+        page.waitFor('.listFUTItem'),
+        page.waitForXPath('//h2[contains(text(), "No results found")]'),
+    ]);
+
+    const isPlayerNotFound = await isNoResultBanner(page);
+    await page.waitFor(getRandomAwaitTime(250, 350));
+
+    if (isPlayerNotFound) {
+        await clickBackButton(page);
+        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+    } else {
+        const isPlayerBuyed = await bidPlayer(
+            page,
+            playerMedia,
+            maxBidPrice,
+            maxExpirationTime,
+            maxActiveBids
+        );
+
+        if (isPlayerBuyed) {
+            playersBuyed++;
+        } else {
+            playerLost++;
+        }
+
+        if (playersBuyed === playersToBuy) {
+            console.log('\n\n');
+            console.log(chalk.blue(`💸 All players neede buyed in ${MAX_NUMBER_ITERATIONS} attempts: `));
+            console.log(chalk.green('🔥 Total players buyed :', playersBuyed));
+            console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
+            return process.exit(0);
+        }
+
+        await clickNextPageButton(page);
+
+        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+    }
+};
+
 (async () => {
     const browser = await puppeteer.launch({
         headless: false,
@@ -87,7 +137,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
 
     try {
         await page.waitForXPath('//button[contains(text(), "Transfers")]', {
-            timeout: 20000,
+            timeout: 25000,
         });
     } catch (e) {
         console.log('You need to login manually and restart the script after that');
@@ -112,6 +162,15 @@ const buyAllPlayer = async (page, playersToBuy) => {
         await setMaxBuyNowPrice(page, maxBuyNowPrice);
     }
 
+    if (minBidPrice) {
+        await setMinBidPrice(page, minBidPrice);
+    }
+
+    if (maxBidPrice) {
+        await setMaxBidPrice(page, maxBidPrice);
+    }
+
     Bar.init(MAX_NUMBER_ITERATIONS);
     await buyAllPlayer(page, playersToBuy);
+    // await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
 })();

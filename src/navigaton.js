@@ -33,8 +33,15 @@ const clickBackButton = async page => {
     await page.click('.btn-navigation');
 };
 
+const clickNextPageButton = async page => {
+    await page.waitFor(200);
+    await page.$('.next');
+    await page.click('.next');
+};
+
 module.exports = {
     goToMarket,
     goToMarketSection,
     clickBackButton,
+    clickNextPageButton,
 };
