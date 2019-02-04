@@ -2,16 +2,18 @@ const puppeteer = require("puppeteer");
 const chalk = require("chalk");
 const ProgressBar = require("./progress-bar");
 
-const MAX_NUMBER_ITERATIONS = 70;
+const MAX_NUMBER_ITERATIONS = 200;
+
 let playersBuyed = 0;
 let playerLost = 0;
 let iteration = 0;
-const playerName = "Omar Mascarell";
-const playerQuality = "";
-const playerMedia = 79;
-const maxBuyNowPrice = 400;
-const minBuyNowPrice = 0;
-const playersToBuy = 3;
+
+const playerName = "Jasper Cillessen";
+const playerQuality = "Special";
+const playerMedia = 84;
+const minBuyNowPrice = 11000;
+const maxBuyNowPrice = 15500;
+const playersToBuy = 1;
 
 const Bar = new ProgressBar();
 const getRandomAwaitTime = (min = 500, max = 1500) =>
