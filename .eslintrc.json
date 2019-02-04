@@ -8,9 +8,10 @@
         "ecmaVersion": 2017
     },
     "rules": {
-        "indent": ["error", 4],
+        "no-tabs": ["error", {"allowIndentationTabs": true}],
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "single"],
-        "semi": ["error", "always"]
+        "semi": ["error", "always"],
+        "no-console": "off"
     }
 }
