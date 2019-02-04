@@ -141,9 +141,7 @@ const buyPlayer = async page => {
   const players = !playerMedia
     ? await page.$$(".listFUTItem")
     : await page.$x(
-        $x(
-          `//li[contains(@class, "listFUTItem") and .//div[contains(text() , "${playerMedia}")]]`
-        )
+        `//li[contains(@class, "listFUTItem") and .//div[contains(text() , "${playerMedia}")]]`
       );
 
   const lastPlayer =
