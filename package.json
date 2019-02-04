@@ -1,15 +1,28 @@
 {
-  "name": "fut",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "^2.4.2",
-    "puppeteer": "^1.12.0"
-  }
+    "name": "fut",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "lint": "eslint --report-unused-disable-directives ."
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "chalk": "^2.4.2",
+        "puppeteer": "^1.12.0"
+    },
+    "prettier": {
+        "printWidth": 110,
+        "tabWidth": 4,
+        "singleQuote": true,
+        "trailingComma": "es5",
+        "bracketSpacing": false
+    },
+    "devDependencies": {
+        "eslint": "^5.13.0",
+        "eslint-config-prettier": "^4.0.0",
+        "prettier": "^1.16.4"
+    }
 }
