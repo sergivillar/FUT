@@ -6,7 +6,7 @@ let iteration = 0;
 const playerName = "Omar Mascarell";
 const playerQuality = "";
 const playerMedia = 79;
-const maxBuyNowPrice = 450;
+const maxBuyNowPrice = 400;
 const minBuyNowPrice = 0;
 const playersToBuy = 3;
 
@@ -161,7 +161,7 @@ const buyPlayer = async page => {
   const confirmBuyButtom = await page.$x(`//button[contains(text(), "Ok")]`);
 
   if (confirmBuyButtom.length > 0) {
-    console.log("Player buyed");
+    console.log("Try to buy");
     await confirmBuyButtom[0].click();
 
     // Check bid status (win or lose)
@@ -191,6 +191,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
 
   if (iteration > MAX_NUMBER_ITERATIONS) {
     console.log("Max. number of iterations exceeded ", MAX_NUMBER_ITERATIONS);
+    console.log("Total players buyed :", playersBuyed);
     return process.exit(0);
   }
 
