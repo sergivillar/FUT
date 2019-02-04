@@ -203,7 +203,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
   if (iteration > MAX_NUMBER_ITERATIONS) {
     console.log("\n\n");
     console.log(
-      chalk.blue("💸 Iteratios end. Attempts: ", MAX_NUMBER_ITERATIONS)
+      chalk.blue("💸 Iterations end. Attempts: ", MAX_NUMBER_ITERATIONS)
     );
     console.log(chalk.green("🔥 Total players buyed :", playersBuyed));
     console.log(
