@@ -1,19 +1,20 @@
 const puppeteer = require("puppeteer");
 
-const MAX_NUMBER_ITERATIONS = 50;
+const MAX_NUMBER_ITERATIONS = 70;
 let playersBuyed = 0;
 let iteration = 0;
-const playerName = "Joan Jordán";
-const playerQuality = "Special";
-const playerMedia = 84;
-const maxBuyNowPrice = 21000;
+const playerName = "Omar Mascarell";
+const playerQuality = "";
+const playerMedia = 79;
+const maxBuyNowPrice = 450;
 const minBuyNowPrice = 0;
-const playersToBuy = 1;
+const playersToBuy = 3;
 
 const getRandomAwaitTime = (min = 500, max = 1500) =>
   Math.floor(Math.random() * (max - min) + min);
 
 const goToMarketTab = async page => {
+  console.log("Go to market section");
   await page.waitFor(getRandomAwaitTime());
 
   const transferMarketTabButton = await page.$x(
@@ -29,6 +30,8 @@ const goToMarketTab = async page => {
 };
 
 const goToMarket = async page => {
+  console.log("Go to market");
+  // TODO, sometimes this does not works
   await page.waitFor(getRandomAwaitTime());
 
   const goToMarketButton = await page.waitForXPath(
@@ -158,7 +161,7 @@ const buyPlayer = async page => {
   const confirmBuyButtom = await page.$x(`//button[contains(text(), "Ok")]`);
 
   if (confirmBuyButtom.length > 0) {
-    console.log("Buy");
+    console.log("Player buyed");
     await confirmBuyButtom[0].click();
 
     // Check bid status (win or lose)
@@ -232,19 +235,13 @@ const buyAllPlayer = async (page, playersToBuy) => {
   const page = await browser.newPage();
   await page.goto("https://www.easports.com/fifa/ultimate-team/web-app/");
 
-  let isUserLogged = false;
   try {
     await page.waitForXPath("//button[contains(text(), 'Transfers')]", {
-      timeout: 15000
+      timeout: 20000
     });
-    isUserLogged = true;
   } catch (e) {
     console.log("You need to login manually and restart the script after that");
-    return;
-  }
-
-  if (!isUserLogged) {
-    return;
+    return process.exit(0);
   }
 
   await goToMarketTab(page);
