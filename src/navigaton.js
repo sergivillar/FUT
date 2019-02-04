@@ -27,7 +27,14 @@ const goToMarket = async page => {
     }
 };
 
+const clickBackButton = async page => {
+    await page.waitFor(200);
+    await page.$('.btn-navigation');
+    await page.click('.btn-navigation');
+};
+
 module.exports = {
     goToMarket,
     goToMarketSection,
+    clickBackButton,
 };
