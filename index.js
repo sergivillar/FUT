@@ -86,6 +86,11 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
 const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
+    await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+}
+
+const massiveBidRecursion = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
+    await page.waitFor(getRandomAwaitTime(300, 400));
 
     await Promise.race([
         page.waitFor('.listFUTItem'),
@@ -97,7 +102,7 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
-        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+        await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
     } else {
         const isPlayerBuyed = await bidPlayer(
             page,
@@ -123,7 +128,7 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
 
         await clickNextPageButton(page);
 
-        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+        await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
     }
 };
 
