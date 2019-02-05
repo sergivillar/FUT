@@ -22,13 +22,13 @@ let playersBuyed = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const playerName = 'José María Giménez';
+const playerName = 'Karim Benzema';
 const playerQuality = 'Gold';
 const playerMedia = 84;
 const minBuyNowPrice = 0;
 const minBidPrice = 0;
 const maxBidPrice = 0;
-const maxBuyNowPrice = 7500;
+const maxBuyNowPrice = 6500;
 const maxExpirationTime = 600; // Seconds
 const maxActiveBids = 2;
 const playersToBuy = 10;
