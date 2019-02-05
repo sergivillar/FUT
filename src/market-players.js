@@ -24,6 +24,10 @@ const buyPlayer = async (page, playerAverage) => {
                   `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`
               );
 
+        if (players.length === 0) {
+            return;
+        }
+
         const lastPlayer = players[Math.floor(Math.random() * (players.length - 0) + 0)];
 
         await lastPlayer.click();
