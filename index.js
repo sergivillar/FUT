@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const chalk = require('chalk');
+const inquirer = require('inquirer');
 const ProgressBar = require('./src/progress-bar');
 const {getRandomAwaitTime} = require('./src/utils');
 const {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} = require('./src/navigaton');
@@ -15,7 +16,7 @@ const {
 } = require('./src/market-section');
 const {isNoResultBanner, buyPlayer, bidPlayer} = require('./src/market-players');
 
-const MAX_NUMBER_ITERATIONS = 200;
+const MAX_NUMBER_ITERATIONS = 100;
 
 let playersBuyed = 0;
 let playerLost = 0;
@@ -34,12 +35,12 @@ const playersToBuy = 1;
 
 const Bar = new ProgressBar();
 
-const buyAllPlayer = async (page, playersToBuy) => {
+const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERATIONS) => {
     Bar.update(iteration++);
 
-    if (iteration > MAX_NUMBER_ITERATIONS) {
+    if (iteration > maxIterations) {
         console.log('\n\n');
-        console.log(chalk.blue('💸 Iterations end. Attempts: ', MAX_NUMBER_ITERATIONS));
+        console.log(chalk.blue('💸 Iterations end. Attempts: ', maxIterations));
         console.log(chalk.green('🔥 Total players buyed :', playersBuyed));
         console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
         return process.exit(0);
@@ -70,7 +71,7 @@ const buyAllPlayer = async (page, playersToBuy) => {
 
         if (playersBuyed === playersToBuy) {
             console.log('\n\n');
-            console.log(chalk.blue(`💸 All players neede buyed in ${MAX_NUMBER_ITERATIONS} attempts: `));
+            console.log(chalk.blue(`💸 All players neede buyed in ${maxIterations} attempts: `));
             console.log(chalk.green('🔥 Total players buyed :', playersBuyed));
             console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
             return process.exit(0);
@@ -126,7 +127,33 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
     }
 };
 
+const BUY_NOW = 'Buy now';
+const BID = 'Bid';
+
 (async () => {
+    const {bidOrBuy} = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'bidOrBuy',
+            message: 'What do you want to do?',
+            choices: [BUY_NOW, BID],
+        },
+    ]);
+
+    const {maxIterations} = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'maxIterations',
+            message: 'How many iterations do you want?',
+            default: MAX_NUMBER_ITERATIONS,
+            when: () => bidOrBuy === BUY_NOW,
+            validate: iterations => !!parseInt(iterations),
+        },
+    ]);
+
+    console.log(bidOrBuy, maxIterations);
+    return;
+
     const browser = await puppeteer.launch({
         headless: false,
         args: ['--user-data-dir=tmp/chrome-data'],
@@ -144,7 +171,7 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
         return;
     }
 
-    console.log('🚀 Start hunting. Number of attempts: ', MAX_NUMBER_ITERATIONS);
+    console.log('🚀 Start hunting. Number of attempts: ', maxIterations || MAX_NUMBER_ITERATIONS);
     await goToMarketSection(page);
     await goToMarket(page);
 
@@ -170,7 +197,10 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
         await setMaxBidPrice(page, maxBidPrice);
     }
 
-    Bar.init(MAX_NUMBER_ITERATIONS);
-    await buyAllPlayer(page, playersToBuy);
-    // await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+    if (bidOrBuy === BUY_NOW) {
+        Bar.init(maxIterations || MAX_NUMBER_ITERATIONS);
+        await buyAllPlayer(page, playersToBuy, maxIterations);
+    } else {
+        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+    }
 })();

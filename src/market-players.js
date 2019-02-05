@@ -27,7 +27,7 @@ const buyPlayer = async (page, playerAverage) => {
 
     await page.waitFor(200);
 
-    await buyButtonClick();
+    await buyButtonClick(page);
 
     await page.waitFor(180);
 
