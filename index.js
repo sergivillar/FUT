@@ -22,16 +22,16 @@ let playersBuyed = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const playerName = 'Jasper Cillessen';
-const playerQuality = 'Special';
+const playerName = 'José María Giménez';
+const playerQuality = 'Gold';
 const playerMedia = 84;
 const minBuyNowPrice = 0;
-const minBidPrice = 10000;
-const maxBidPrice = 15500;
-const maxBuyNowPrice = 0;
+const minBidPrice = 0;
+const maxBidPrice = 0;
+const maxBuyNowPrice = 7500;
 const maxExpirationTime = 600; // Seconds
 const maxActiveBids = 2;
-const playersToBuy = 1;
+const playersToBuy = 10;
 
 const Bar = new ProgressBar();
 
@@ -87,7 +87,7 @@ const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) =
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
     await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
-}
+};
 
 const massiveBidRecursion = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
@@ -155,9 +155,6 @@ const BID = 'Bid';
             validate: iterations => !!parseInt(iterations),
         },
     ]);
-
-    console.log(bidOrBuy, maxIterations);
-    return;
 
     const browser = await puppeteer.launch({
         headless: false,
