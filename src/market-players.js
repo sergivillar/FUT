@@ -11,7 +11,8 @@ const buyButtonClick = async page => {
 };
 
 const bidButtonClick = async page => {
-    await page.click('.bidButton');
+    const bitButton = await page.waitFor('.bidButton');
+    await bitButton.asElement().click();
 };
 
 const buyPlayer = async (page, playerAverage) => {
