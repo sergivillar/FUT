@@ -16,44 +16,53 @@ const bidButtonClick = async page => {
 };
 
 const buyPlayer = async (page, playerAverage) => {
-    const players = !playerAverage
-        ? await page.$$('.listFUTItem')
-        : await page.$x(
-              `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`
-          );
+    let players;
+    try {
+        players = !playerAverage
+            ? await page.$$('.listFUTItem')
+            : await page.$x(
+                  `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`
+              );
 
-    const lastPlayer = players[Math.floor(Math.random() * (players.length - 0) + 0)];
+        const lastPlayer = players[Math.floor(Math.random() * (players.length - 0) + 0)];
 
-    await lastPlayer.click();
+        await lastPlayer.click();
 
-    await page.waitFor(200);
+        await page.waitFor(200);
 
-    await buyButtonClick(page);
+        await buyButtonClick(page);
 
-    await page.waitFor(180);
+        await page.waitFor(180);
 
-    const confirmBuyButtom = await page.$x('//button[contains(text(), "Ok")]');
+        const confirmBuyButtom = await page.$x('//button[contains(text(), "Ok")]');
 
-    if (confirmBuyButtom.length > 0) {
-        await confirmBuyButtom[0].click();
+        if (confirmBuyButtom.length > 0) {
+            await confirmBuyButtom[0].click();
 
-        await Promise.race([page.waitFor('.expired'), page.waitFor('.won')]);
+            await Promise.race([page.waitFor('.expired'), page.waitFor('.won')]);
 
-        const errorStatus = await page.$x(
-            '//p[contains(text(), "Bid status changed, auction data will be updated.")]'
-        );
+            const errorStatus = await page.$x(
+                '//p[contains(text(), "Bid status changed, auction data will be updated.")]'
+            );
 
-        if (errorStatus.length > 0) {
-            await page.waitFor(150);
+            if (errorStatus.length > 0) {
+                await page.waitFor(150);
+                return false;
+            }
+
+            const playerWon = await page.$('.won');
+
+            return !!playerWon;
+        } else {
+            console.log('Confirm buy button nor found', confirmBuyButtom);
             return false;
         }
-
-        const playerWon = await page.$('.won');
-
-        return !!playerWon;
-    } else {
-        console.log('Confirm buy button nor found', confirmBuyButtom);
-        return false;
+    } catch (e) {
+        console.log('Woops. Something went wrong');
+        console.log(e);
+        console.log({playerAverage});
+        console.log(`//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`);
+        console.log(players);
     }
 };
 
