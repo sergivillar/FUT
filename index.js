@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
 const ProgressBar = require('./src/progress-bar');
-const {getRandomAwaitTime} = require('./src/utils');
+const {getRandomAwaitTime, playAudio} = require('./src/utils');
 const {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} = require('./src/navigaton');
 const {
     setMinBuyNowPrice,
@@ -64,6 +64,7 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
         const isPlayerBuyed = await buyPlayer(page, playerMedia);
 
         if (isPlayerBuyed) {
+            await playAudio(page);
             playersBuyed++;
         } else {
             playerLost++;
