@@ -19,7 +19,7 @@ const buyPlayer = async (page, playerAverage) => {
     const players = !playerAverage
         ? await page.$$('.listFUTItem')
         : await page.$x(
-              `//li[contains(@class, "listFUTItem") and .//div[contains(text() , "${playerAverage}")]]`
+              `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`
           );
 
     const lastPlayer = players[Math.floor(Math.random() * (players.length - 0) + 0)];
