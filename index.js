@@ -22,13 +22,13 @@ let playersBuyed = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const playerName = 'Karim Benzema';
+const playerName = 'Javi Martínez';
 const playerQuality = 'Gold';
 const playerMedia = 84;
 const minBuyNowPrice = 0;
 const minBidPrice = 0;
 const maxBidPrice = 0;
-const maxBuyNowPrice = 6500;
+const maxBuyNowPrice = 3800;
 const maxExpirationTime = 600; // Seconds
 const maxActiveBids = 2;
 const playersToBuy = 10;
@@ -59,7 +59,7 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
-        await buyAllPlayer(page, playersToBuy);
+        await buyAllPlayer(page, playersToBuy, maxIterations);
     } else {
         const isPlayerBuyed = await buyPlayer(page, playerMedia);
 
@@ -80,7 +80,7 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
 
         await clickBackButton(page);
 
-        await buyAllPlayer(page, playersToBuy);
+        await buyAllPlayer(page, playersToBuy, maxIterations);
     }
 };
 
