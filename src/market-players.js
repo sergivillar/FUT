@@ -72,9 +72,9 @@ const buyPlayer = async (page, playerAverage) => {
 
 const bidPlayer = async (page, playerAverage, maxBidPrice, maxExpirationTime, maxActiveBids) => {
     const players = !playerAverage
-        ? await page.$$('.listFUTItem')
+        ? await page.$$('.listFUTItem:not(.expired):not(.highest-bid)')
         : await page.$x(
-              `//li[contains(@class, "listFUTItem") and .//div[contains(text() , "${playerAverage}")]]`
+              `//li[contains(@class, "listFUTItem") and not(contains(@class, "highest-bid")) and not(contains(@class, "expired")) and .//div[contains(text() , "${playerAverage}")]]`
           );
 
     for (const player of players) {
