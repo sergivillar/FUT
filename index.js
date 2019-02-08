@@ -22,16 +22,16 @@ let playersBought = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const playerName = 'Julian Brandt';
-const playerQuality = 'Special';
-const playerMedia = 84;
+const playerName = 'Jorge Meré';
+const playerQuality = 'Gold';
+const playerMedia = 77;
 const minBuyNowPrice = 0;
 const minBidPrice = 0;
 const maxBidPrice = 0;
-const maxBuyNowPrice = 20000;
+const maxBuyNowPrice = 1500;
 const maxExpirationTime = 600; // Seconds
 const maxActiveBids = 2;
-const playersToBuy = 3;
+const playersToBuy = 8;
 
 const Bar = new ProgressBar();
 

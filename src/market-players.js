@@ -32,11 +32,9 @@ const buyPlayer = async (page, playerAverage) => {
 
         await lastPlayer.click();
 
-        await page.waitFor(130);
-
         await buyButtonClick(page);
 
-        await page.waitFor(180);
+        await page.waitFor(120);
 
         const confirmBuyButtom = await page.$x('//button[contains(text(), "Ok")]');
 
