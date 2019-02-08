@@ -1,21 +1,27 @@
-const {getRandomAwaitTime, getSecondsFromTime} = require('./utils');
+import {Page} from 'puppeteer';
+import {getRandomAwaitTime, getSecondsFromTime} from './utils';
 
-const isNoResultBanner = async page => {
+export const isNoResultBanner = async (page: Page) => {
     const noResultBanner = await page.$x('//h2[contains(text(), "No results found")]');
 
     return !!noResultBanner.length;
 };
 
-const buyButtonClick = async page => {
+export const buyButtonClick = async (page: Page) => {
     await page.click('.buyButton');
 };
 
-const bidButtonClick = async page => {
-    const bitButton = await page.waitFor('.bidButton');
-    await bitButton.asElement().click();
+export const bidButtonClick = async (page: Page): Promise<any> => {
+    const bitButton = (await page.waitFor('.bidButton')).asElement();
+
+    if (!bitButton) {
+        return await bidButtonClick(page);
+    }
+
+    await bitButton.click();
 };
 
-const buyPlayer = async (page, playerAverage) => {
+export const buyPlayer = async (page: Page, playerAverage: number) => {
     let players;
     try {
         players = !playerAverage
@@ -68,7 +74,12 @@ const buyPlayer = async (page, playerAverage) => {
     }
 };
 
-const bidPlayer = async (page, playerAverage, maxBidPrice, maxExpirationTime, maxActiveBids) => {
+export const bidPlayer = async (
+    page: Page,
+    playerAverage: number,
+    maxBidPrice: number,
+    maxExpirationTime: number
+) => {
     const players = !playerAverage
         ? await page.$$('.listFUTItem:not(.expired):not(.highest-bid)')
         : await page.$x(
@@ -80,7 +91,7 @@ const bidPlayer = async (page, playerAverage, maxBidPrice, maxExpirationTime, ma
 
         const nextBidInput = await page.waitFor('.numericInput');
 
-        const nextBid = await (await nextBidInput.getProperty('value')).jsonValue();
+        const nextBid = (await (await nextBidInput.getProperty('value')).jsonValue()) as string;
         const nextBidNumber = parseFloat(nextBid.replace(/,/g, ''));
 
         const expiredTimeSpan = await page.$x(
@@ -91,7 +102,9 @@ const bidPlayer = async (page, playerAverage, maxBidPrice, maxExpirationTime, ma
             console.log('Error reading player expired time');
             continue;
         }
-        const expiredTimeText = await (await expiredTimeSpan[0].getProperty('textContent')).jsonValue();
+        const expiredTimeText = (await (await expiredTimeSpan[0].getProperty(
+            'textContent'
+        )).jsonValue()) as string;
         const expireTimeInSeconds = getSecondsFromTime(expiredTimeText);
 
         if (!expireTimeInSeconds || expireTimeInSeconds > maxExpirationTime || nextBidNumber > maxBidPrice) {
@@ -107,10 +120,4 @@ const bidPlayer = async (page, playerAverage, maxBidPrice, maxExpirationTime, ma
 
         // const playerBid = await page.$('.won .player');
     }
-};
-
-module.exports = {
-    isNoResultBanner,
-    buyPlayer,
-    bidPlayer,
 };

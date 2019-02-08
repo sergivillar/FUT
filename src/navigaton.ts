@@ -1,47 +1,51 @@
-const {getRandomAwaitTime} = require('./utils');
+import {Page} from 'puppeteer';
+import {getRandomAwaitTime} from './utils';
 
-const goToMarketSection = async page => {
+export const goToMarketSection = async (page: Page): Promise<any> => {
     await page.waitFor(getRandomAwaitTime());
 
     const transferMarketTabButton = await page.waitForXPath('//button[contains(text(), "Transfers")]');
+
+    if (!transferMarketTabButton) {
+        return await goToMarketSection(page);
+    }
+
     await transferMarketTabButton.asElement().click();
     await page.waitFor(getRandomAwaitTime(250, 350));
 
     const checkTransferPageLoaded = await page.$x('//h1[contains(text(), "Search the Transfer Market")]');
 
     if (checkTransferPageLoaded.length === 0) {
-        await goToMarketSection(page);
+        return await goToMarketSection(page);
     }
 };
 
-const goToMarket = async page => {
+export const goToMarket = async (page: Page): Promise<any> => {
     await page.waitFor(getRandomAwaitTime());
 
     const goToMarketButton = await page.waitForXPath('//h1[contains(text(), "Search the Transfer Market")]');
+
+    if (!goToMarketButton) {
+        return await goToMarketSection(page);
+    }
+
     await goToMarketButton.asElement().click();
 
     const checkMarketPageLoaded = await page.$('input[placeholder="Type Player Name"]');
 
     if (!checkMarketPageLoaded) {
-        await goToMarket(page);
+        return await goToMarket(page);
     }
 };
 
-const clickBackButton = async page => {
+export const clickBackButton = async (page: Page) => {
     await page.waitFor(200);
     await page.$('.btn-navigation');
     await page.click('.btn-navigation');
 };
 
-const clickNextPageButton = async page => {
+export const clickNextPageButton = async (page: Page) => {
     await page.waitFor(200);
     await page.$('.next');
     await page.click('.next');
-};
-
-module.exports = {
-    goToMarket,
-    goToMarketSection,
-    clickBackButton,
-    clickNextPageButton,
 };

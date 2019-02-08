@@ -1,10 +1,10 @@
-const puppeteer = require('puppeteer');
-const chalk = require('chalk');
-const inquirer = require('inquirer');
-const ProgressBar = require('./src/progress-bar');
-const {getRandomAwaitTime, playAudio} = require('./src/utils');
-const {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} = require('./src/navigaton');
-const {
+import puppeteer, {Page} from 'puppeteer';
+import chalk from 'chalk';
+import inquirer from 'inquirer';
+import ProgressBar from './src/progress-bar';
+import {getRandomAwaitTime, playAudio} from './src/utils';
+import {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} from './src/navigaton';
+import {
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
     setMinBidPrice,
@@ -13,8 +13,15 @@ const {
     typePlayerOnInput,
     selectPlayer,
     searchPlayer,
-} = require('./src/market-section');
-const {isNoResultBanner, buyPlayer, bidPlayer} = require('./src/market-players');
+} from './src/market-section';
+import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
+
+const SPECIAL = 'Special';
+const GOLD = 'Gold';
+const SILVER = 'Silver';
+const BRONZE = 'Bronze';
+
+export type PLAYERS_QUALITY = typeof SPECIAL | typeof GOLD | typeof SILVER | typeof BRONZE;
 
 const MAX_NUMBER_ITERATIONS = 100;
 
@@ -35,14 +42,14 @@ const playersToBuy = 8;
 
 const Bar = new ProgressBar();
 
-const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERATIONS) => {
+const buyAllPlayer = async (page: Page, playersToBuy: number, maxIterations = MAX_NUMBER_ITERATIONS) => {
     Bar.update(iteration++);
 
     if (iteration > maxIterations) {
         console.log('\n\n');
-        console.log(chalk.blue('💸 Iterations end. Attempts: ', maxIterations));
-        console.log(chalk.green('🔥 Total players bought :', playersBought));
-        console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
+        console.log(chalk.blue(`💸 Iterations end. Attempts: ${maxIterations}`));
+        console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
+        console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
         return process.exit(0);
     }
 
@@ -73,8 +80,8 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
         if (playersBought === playersToBuy) {
             console.log('\n\n');
             console.log(chalk.blue(`💸 All players neede bought in ${maxIterations} attempts: `));
-            console.log(chalk.green('🔥 Total players bought :', playersBought));
-            console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
+            console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
+            console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
             return process.exit(0);
         }
 
@@ -84,13 +91,23 @@ const buyAllPlayer = async (page, playersToBuy, maxIterations = MAX_NUMBER_ITERA
     }
 };
 
-const massiveBid = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
+const massiveBid = async (
+    page: Page,
+    maxBidPrice: number,
+    maxExpirationTime: number,
+    maxActiveBids: number
+) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
     await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
 };
 
-const massiveBidRecursion = async (page, maxBidPrice, maxExpirationTime, maxActiveBids) => {
+const massiveBidRecursion = async (
+    page: Page,
+    maxBidPrice: number,
+    maxExpirationTime: number,
+    maxActiveBids: number
+) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
 
     await Promise.race([
@@ -105,27 +122,21 @@ const massiveBidRecursion = async (page, maxBidPrice, maxExpirationTime, maxActi
         await clickBackButton(page);
         await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
     } else {
-        const isPlayerBought = await bidPlayer(
-            page,
-            playerMedia,
-            maxBidPrice,
-            maxExpirationTime,
-            maxActiveBids
-        );
+        await bidPlayer(page, playerMedia, maxBidPrice, maxExpirationTime);
 
-        if (isPlayerBought) {
-            playersBought++;
-        } else {
-            playerLost++;
-        }
+        // if (isPlayerBought) {
+        //     playersBought++;
+        // } else {
+        //     playerLost++;
+        // }
 
-        if (playersBought === playersToBuy) {
-            console.log('\n\n');
-            console.log(chalk.blue(`💸 All players neede bought in ${MAX_NUMBER_ITERATIONS} attempts: `));
-            console.log(chalk.green('🔥 Total players bought :', playersBought));
-            console.log(chalk.red('🐀 Total players stolen by a rat kid :', playerLost));
-            return process.exit(0);
-        }
+        // if (playersBought === playersToBuy) {
+        //     console.log('\n\n');
+        //     console.log(chalk.blue(`💸 All players neede bought in ${MAX_NUMBER_ITERATIONS} attempts: `));
+        //     console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
+        //     console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
+        //     return process.exit(0);
+        // }
 
         await clickNextPageButton(page);
 

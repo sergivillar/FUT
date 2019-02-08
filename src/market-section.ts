@@ -1,6 +1,8 @@
-const {getRandomAwaitTime} = require('./utils');
+import {Page} from 'puppeteer';
+import {getRandomAwaitTime} from './utils';
+import {PLAYERS_QUALITY} from '../index';
 
-const typePlayerOnInput = async (page, playerName) => {
+export const typePlayerOnInput = async (page: Page, playerName: string) => {
     await page.waitFor(getRandomAwaitTime());
 
     await page.click('input[placeholder="Type Player Name"]');
@@ -12,26 +14,41 @@ const typePlayerOnInput = async (page, playerName) => {
     });
 };
 
-const selectPlayer = async (page, playerName) => {
+export const selectPlayer = async (page: Page, playerName: string): Promise<any> => {
     await page.waitFor(getRandomAwaitTime() * 1.5);
 
     const selectPlayerButton = await page.waitForXPath(`//span[contains(text(), "${playerName}")]`);
+
+    if (!selectPlayerButton) {
+        return await selectPlayer(page, playerName);
+    }
+
     await selectPlayerButton.asElement().click();
 };
 
-const changeQuality = async (page, quality) => {
+export const changeQuality = async (page: Page, quality: PLAYERS_QUALITY): Promise<any> => {
     await page.waitFor(getRandomAwaitTime());
 
     const qualityButton = await page.waitForXPath('//span[contains(text(), "Quality")]');
+
+    if (!qualityButton) {
+        return await changeQuality(page, quality);
+    }
+
     await qualityButton.asElement().click();
 
     await page.waitFor(500);
 
     const qualityOptionButton = await page.waitForXPath(`//li[contains(text(), '${quality}')]`);
+
+    if (!qualityOptionButton) {
+        return await changeQuality(page, quality);
+    }
+
     await qualityOptionButton.asElement().click();
 };
 
-const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
+export const setMaxBuyNowPrice = async (page: Page, maxPrice = 0) => {
     await page.waitFor(getRandomAwaitTime());
 
     const valueInputs = await page.$$('.numericInput');
@@ -52,7 +69,7 @@ const setMaxBuyNowPrice = async (page, maxPrice = 0) => {
     });
 };
 
-const setMinBuyNowPrice = async (page, minPrice = 0) => {
+export const setMinBuyNowPrice = async (page: Page, minPrice = 0) => {
     await page.waitFor(getRandomAwaitTime());
 
     const valueInputs = await page.$$('.numericInput');
@@ -73,7 +90,7 @@ const setMinBuyNowPrice = async (page, minPrice = 0) => {
     });
 };
 
-const setMaxBidPrice = async (page, maxPrice = 0) => {
+export const setMaxBidPrice = async (page: Page, maxPrice = 0) => {
     await page.waitFor(getRandomAwaitTime());
 
     const valueInputs = await page.$$('.numericInput');
@@ -94,7 +111,7 @@ const setMaxBidPrice = async (page, maxPrice = 0) => {
     });
 };
 
-const setMinBidPrice = async (page, minPrice = 0) => {
+export const setMinBidPrice = async (page: Page, minPrice = 0) => {
     await page.waitFor(getRandomAwaitTime());
 
     const valueInputs = await page.$$('.numericInput');
@@ -115,18 +132,12 @@ const setMinBidPrice = async (page, minPrice = 0) => {
     });
 };
 
-const searchPlayer = async page => {
+export const searchPlayer = async (page: Page): Promise<any> => {
     const searchButton = await page.waitForXPath('//button[contains(text(), "Search")]');
-    await searchButton.asElement().click();
-};
 
-module.exports = {
-    typePlayerOnInput,
-    selectPlayer,
-    setMinBuyNowPrice,
-    setMaxBuyNowPrice,
-    setMinBidPrice,
-    setMaxBidPrice,
-    changeQuality,
-    searchPlayer,
+    if (!searchButton) {
+        return await searchPlayer(page);
+    }
+
+    await searchButton.asElement().click();
 };
