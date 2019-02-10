@@ -1,0 +1,9 @@
+name: 'Soares'
+rating: 79
+buy_now: # [Optional] Complete it if you want to have the buy now operation available
+  min_bid_price: 0
+  max_bid_price: 0
+  min_buy_now_price: 0
+  max_buy_now_price: 700
+  max_iterations: 50
+  players_to_buy: 15
