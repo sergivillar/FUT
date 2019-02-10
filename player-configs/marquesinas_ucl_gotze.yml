@@ -5,7 +5,7 @@ bid: # [Optional] Complete it if you want to have the bid operation available
   min_buy_now_price: 0
   max_buy_now_price: 0
   max_expiration_time: 1200
-bid: # [Optional] Complete it if you want to have the buy now operation available
+buy_now: # [Optional] Complete it if you want to have the buy now operation available
   min_bid_price: 0
   max_bid_price: 0
   min_buy_now_price: 0
