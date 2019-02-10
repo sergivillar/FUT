@@ -121,11 +121,11 @@ export const bidPlayer = async (
             continue;
         }
 
-        await page.waitFor(200);
+        await page.waitFor(400);
 
         await bidButtonClick(page);
 
-        await page.waitFor(300);
+        await page.waitFor(600);
 
         // const playerBid = await page.$('.won .player');
     }
