@@ -1,6 +1,6 @@
+import { getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation } from './src/cli';
 import puppeteer, {Page} from 'puppeteer';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import ProgressBar from './src/progress-bar';
 import {getRandomAwaitTime, playAudio} from './src/utils';
 import {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} from './src/navigaton';
@@ -15,39 +15,22 @@ import {
     searchPlayer,
 } from './src/market-section';
 import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-
-const SPECIAL = 'Special';
-const GOLD = 'Gold';
-const SILVER = 'Silver';
-const BRONZE = 'Bronze';
-
-export type PLAYERS_QUALITY = typeof SPECIAL | typeof GOLD | typeof SILVER | typeof BRONZE;
-
-const MAX_NUMBER_ITERATIONS = 100;
+import { OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid } from './src/models';
 
 let playersBought = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const playerName = 'Jorge Meré';
-const playerQuality = 'Gold';
-const playerMedia = 77;
-const minBuyNowPrice = 0;
-const minBidPrice = 0;
-const maxBidPrice = 0;
-const maxBuyNowPrice = 0;
-const maxExpirationTime = 600; // Seconds
 const maxActiveBids = 2;
-const playersToBuy = 8;
 
 const Bar = new ProgressBar();
 
-const buyAllPlayer = async (page: Page, playersToBuy: number, maxIterations = MAX_NUMBER_ITERATIONS) => {
+const buyAllPlayer = async (page: Page, playerConfig: PlayerConfig, operation: BuyNow) => {
     Bar.update(iteration++);
 
-    if (iteration > maxIterations) {
+    if (iteration > operation.max_iterations) {
         console.log('\n\n');
-        console.log(chalk.blue(`💸 Iterations end. Attempts: ${maxIterations}`));
+        console.log(chalk.blue(`💸 Iterations end. Attempts: ${operation.max_iterations}`));
         console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
         console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
         return process.exit(0);
@@ -66,9 +49,9 @@ const buyAllPlayer = async (page: Page, playersToBuy: number, maxIterations = MA
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
-        await buyAllPlayer(page, playersToBuy, maxIterations);
+        await buyAllPlayer(page, playerConfig, operation);
     } else {
-        const isPlayerBought = await buyPlayer(page, playerMedia);
+        const isPlayerBought = await buyPlayer(page, playerConfig.rating);
 
         if (isPlayerBought) {
             await playAudio(page);
@@ -77,9 +60,9 @@ const buyAllPlayer = async (page: Page, playersToBuy: number, maxIterations = MA
             playerLost++;
         }
 
-        if (playersBought === playersToBuy) {
+        if (playersBought === operation.players_to_buy) {
             console.log('\n\n');
-            console.log(chalk.blue(`💸 All players neede bought in ${maxIterations} attempts: `));
+            console.log(chalk.blue(`💸 All players neede bought in ${operation.max_iterations} attempts: `));
             console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
             console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
             return process.exit(0);
@@ -87,25 +70,25 @@ const buyAllPlayer = async (page: Page, playersToBuy: number, maxIterations = MA
 
         await clickBackButton(page);
 
-        await buyAllPlayer(page, playersToBuy, maxIterations);
+        await buyAllPlayer(page, playerConfig, operation);
     }
 };
 
 const massiveBid = async (
     page: Page,
-    maxBidPrice: number,
-    maxExpirationTime: number,
+    playerConfig: PlayerConfig,
+    operation: Bid,
     maxActiveBids: number
 ) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
-    await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+    await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
 };
 
 const massiveBidRecursion = async (
     page: Page,
-    maxBidPrice: number,
-    maxExpirationTime: number,
+    playerConfig: PlayerConfig,
+    operation: Bid,
     maxActiveBids: number
 ) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
@@ -120,54 +103,17 @@ const massiveBidRecursion = async (
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
-        await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+        await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
     } else {
-        await bidPlayer(page, playerMedia, maxBidPrice, maxExpirationTime);
-
-        // if (isPlayerBought) {
-        //     playersBought++;
-        // } else {
-        //     playerLost++;
-        // }
-
-        // if (playersBought === playersToBuy) {
-        //     console.log('\n\n');
-        //     console.log(chalk.blue(`💸 All players neede bought in ${MAX_NUMBER_ITERATIONS} attempts: `));
-        //     console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
-        //     console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
-        //     return process.exit(0);
-        // }
+        await bidPlayer(page, operation.max_bid_price, operation.max_expiration_time, playerConfig.rating);
 
         await clickNextPageButton(page);
 
-        await massiveBidRecursion(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+        await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
     }
 };
 
-const BUY_NOW = 'Buy now';
-const BID = 'Bid';
-
-(async () => {
-    const {bidOrBuy} = await inquirer.prompt([
-        {
-            type: 'list',
-            name: 'bidOrBuy',
-            message: 'What do you want to do?',
-            choices: [BUY_NOW, BID],
-        },
-    ]);
-
-    const {maxIterations} = await inquirer.prompt([
-        {
-            type: 'input',
-            name: 'maxIterations',
-            message: 'How many iterations do you want?',
-            default: MAX_NUMBER_ITERATIONS,
-            when: () => bidOrBuy === BUY_NOW,
-            validate: iterations => !!parseInt(iterations),
-        },
-    ]);
-
+const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig) => {
     const browser = await puppeteer.launch({
         headless: false,
         args: ['--user-data-dir=tmp/chrome-data'],
@@ -185,36 +131,64 @@ const BID = 'Bid';
         return;
     }
 
-    console.log('🚀 Start hunting. Number of attempts: ', maxIterations || MAX_NUMBER_ITERATIONS);
     await goToMarketSection(page);
     await goToMarket(page);
 
-    await typePlayerOnInput(page, playerName);
-    await selectPlayer(page, playerName);
+    await typePlayerOnInput(page, playerConfig.name);
+    await selectPlayer(page, playerConfig.name);
 
-    if (playerQuality) {
-        await changeQuality(page, playerQuality);
+    if (playerConfig.quality) {
+        await changeQuality(page, playerConfig.quality);
     }
 
-    if (minBuyNowPrice) {
-        await setMinBuyNowPrice(page, minBuyNowPrice);
+    if (operation === BID && playerConfig.bid) {
+        const bid = playerConfig.bid
+        if (bid.min_buy_now_price > 0) {
+            await setMinBuyNowPrice(page, bid.min_buy_now_price);
+        }
+        if (bid.max_buy_now_price > 0) {
+            await setMaxBuyNowPrice(page, bid.max_buy_now_price);
+        }
+    
+        if (bid.min_bid_price > 0) {
+            await setMinBidPrice(page, bid.min_bid_price);
+        }
+    
+        if (bid.max_bid_price > 0) {
+            await setMaxBidPrice(page, bid.max_bid_price);
+        }
+        await massiveBid(page, playerConfig, bid, maxActiveBids);
     }
-    if (maxBuyNowPrice) {
-        await setMaxBuyNowPrice(page, maxBuyNowPrice);
+    else if (operation === BUY_NOW && playerConfig.buy_now) {
+        const buyNow = playerConfig.buy_now
+        if (buyNow.min_buy_now_price > 0) {
+            await setMinBuyNowPrice(page, buyNow.min_buy_now_price);
+        }
+        if (buyNow.max_buy_now_price > 0) {
+            await setMaxBuyNowPrice(page, buyNow.max_buy_now_price);
+        }
+    
+        if (buyNow.min_bid_price > 0) {
+            await setMinBidPrice(page, buyNow.min_bid_price);
+        }
+    
+        if (buyNow.max_bid_price > 0) {
+            await setMaxBidPrice(page, buyNow.max_bid_price);
+        }
+        console.log('🚀 Start hunting. Number of attempts: ', buyNow.max_iterations);
+        Bar.init(buyNow.max_iterations);
+        await buyAllPlayer(page, playerConfig, buyNow);
     }
+    else {
+        console.log('Unknown operation: ' + operation)
+    }
+}
 
-    if (minBidPrice) {
-        await setMinBidPrice(page, minBidPrice);
-    }
-
-    if (maxBidPrice) {
-        await setMaxBidPrice(page, maxBidPrice);
-    }
-
-    if (bidOrBuy === BUY_NOW) {
-        Bar.init(maxIterations || MAX_NUMBER_ITERATIONS);
-        await buyAllPlayer(page, playersToBuy, maxIterations);
-    } else {
-        await massiveBid(page, maxBidPrice, maxExpirationTime, maxActiveBids);
+(async () => {
+    const menuAction = await getMenuAction();
+    if (menuAction === LOAD_PLAYER_CONFIG) {
+        const playerConfig = await loadPlayerConfig()
+        const operation = await getConfigOperation(playerConfig)
+        executeOperation(operation, playerConfig)
     }
 })();

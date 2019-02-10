@@ -21,14 +21,17 @@ export const bidButtonClick = async (page: Page): Promise<any> => {
     await bitButton.click();
 };
 
-export const buyPlayer = async (page: Page, playerAverage: number) => {
+export const buyPlayer = async (page: Page, rating?: number) => {
     let players;
     try {
-        players = !playerAverage
-            ? await page.$$('.listFUTItem')
-            : await page.$x(
-                  `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`
+        if (rating) {
+            players = await page.$x(
+                  `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${rating})]]`
               );
+        }
+        else {
+            players = await page.$$('.listFUTItem')    
+        }
 
         if (players.length === 0) {
             return;
@@ -68,23 +71,29 @@ export const buyPlayer = async (page: Page, playerAverage: number) => {
     } catch (e) {
         console.log('Woops. Something went wrong');
         console.log(e);
-        console.log({playerAverage});
-        console.log(`//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${playerAverage})]]`);
+        if (rating) {
+           console.log(rating);
+        }
+        console.log(`//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${rating})]]`);
         console.log(players);
     }
 };
 
 export const bidPlayer = async (
     page: Page,
-    playerAverage: number,
     maxBidPrice: number,
-    maxExpirationTime: number
+    maxExpirationTime: number,
+    rating?: number,
 ) => {
-    const players = !playerAverage
-        ? await page.$$('.listFUTItem:not(.expired):not(.highest-bid)')
-        : await page.$x(
-              `//li[contains(@class, "listFUTItem") and not(contains(@class, "highest-bid")) and not(contains(@class, "expired")) and .//div[contains(text() , "${playerAverage}")]]`
-          );
+    let players;
+    if (rating) {
+        players = await page.$x(
+            `//li[contains(@class, "listFUTItem") and not(contains(@class, "highest-bid")) and not(contains(@class, "expired")) and .//div[contains(text() , "${rating}")]]`
+        );
+    }
+    else {
+        players = await page.$$('.listFUTItem:not(.expired):not(.highest-bid)')
+    }
 
     for (const player of players) {
         await player.click();

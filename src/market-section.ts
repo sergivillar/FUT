@@ -1,6 +1,6 @@
 import {Page} from 'puppeteer';
 import {getRandomAwaitTime} from './utils';
-import {PLAYERS_QUALITY} from '../index';
+import { PLAYERS_QUALITY } from './models';
 
 export const typePlayerOnInput = async (page: Page, playerName: string) => {
     await page.waitFor(getRandomAwaitTime());

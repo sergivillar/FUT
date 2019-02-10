@@ -1,0 +1,7 @@
+name: 'Oussama Tannane'
+bid:
+  min_bid_price: 0
+  max_bid_price: 800
+  min_buy_now_price: 0
+  max_buy_now_price: 0
+  max_expiration_time: 8600
