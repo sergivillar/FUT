@@ -1,4 +1,4 @@
-import { getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation } from './src/cli';
+import {getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation} from './src/cli';
 import puppeteer, {Page} from 'puppeteer';
 import chalk from 'chalk';
 import ProgressBar from './src/progress-bar';
@@ -15,7 +15,7 @@ import {
     searchPlayer,
 } from './src/market-section';
 import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-import { OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid } from './src/models';
+import {OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid} from './src/models';
 
 let playersBought = 0;
 let playerLost = 0;
@@ -74,12 +74,7 @@ const buyAllPlayer = async (page: Page, playerConfig: PlayerConfig, operation: B
     }
 };
 
-const massiveBid = async (
-    page: Page,
-    playerConfig: PlayerConfig,
-    operation: Bid,
-    maxActiveBids: number
-) => {
+const massiveBid = async (page: Page, playerConfig: PlayerConfig, operation: Bid, maxActiveBids: number) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
     await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
@@ -142,53 +137,51 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     }
 
     if (operation === BID && playerConfig.bid) {
-        const bid = playerConfig.bid
+        const bid = playerConfig.bid;
         if (bid.min_buy_now_price > 0) {
             await setMinBuyNowPrice(page, bid.min_buy_now_price);
         }
         if (bid.max_buy_now_price > 0) {
             await setMaxBuyNowPrice(page, bid.max_buy_now_price);
         }
-    
+
         if (bid.min_bid_price > 0) {
             await setMinBidPrice(page, bid.min_bid_price);
         }
-    
+
         if (bid.max_bid_price > 0) {
             await setMaxBidPrice(page, bid.max_bid_price);
         }
         await massiveBid(page, playerConfig, bid, maxActiveBids);
-    }
-    else if (operation === BUY_NOW && playerConfig.buy_now) {
-        const buyNow = playerConfig.buy_now
+    } else if (operation === BUY_NOW && playerConfig.buy_now) {
+        const buyNow = playerConfig.buy_now;
         if (buyNow.min_buy_now_price > 0) {
             await setMinBuyNowPrice(page, buyNow.min_buy_now_price);
         }
         if (buyNow.max_buy_now_price > 0) {
             await setMaxBuyNowPrice(page, buyNow.max_buy_now_price);
         }
-    
+
         if (buyNow.min_bid_price > 0) {
             await setMinBidPrice(page, buyNow.min_bid_price);
         }
-    
+
         if (buyNow.max_bid_price > 0) {
             await setMaxBidPrice(page, buyNow.max_bid_price);
         }
         console.log('🚀 Start hunting. Number of attempts: ', buyNow.max_iterations);
         Bar.init(buyNow.max_iterations);
         await buyAllPlayer(page, playerConfig, buyNow);
+    } else {
+        console.log('Unknown operation: ' + operation);
     }
-    else {
-        console.log('Unknown operation: ' + operation)
-    }
-}
+};
 
 (async () => {
     const menuAction = await getMenuAction();
     if (menuAction === LOAD_PLAYER_CONFIG) {
-        const playerConfig = await loadPlayerConfig()
-        const operation = await getConfigOperation(playerConfig)
-        executeOperation(operation, playerConfig)
+        const playerConfig = await loadPlayerConfig();
+        const operation = await getConfigOperation(playerConfig);
+        executeOperation(operation, playerConfig);
     }
 })();
