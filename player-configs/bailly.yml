@@ -5,3 +5,5 @@ bid:
   min_buy_now_price: 0
   max_buy_now_price: 0
   max_expiration_time: 1800
+sell:
+  price: 1200
