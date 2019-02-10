@@ -1,7 +1,7 @@
-name: 'Williams'
+name: 'Eric Bailly'
 bid:
   min_bid_price: 0
-  max_bid_price: 850
+  max_bid_price: 700
   min_buy_now_price: 0
   max_buy_now_price: 0
-  max_expiration_time: 3600
+  max_expiration_time: 1800
