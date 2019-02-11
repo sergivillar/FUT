@@ -3,34 +3,33 @@ export const BID = 'Bid';
 
 export type OPERATION = typeof BUY_NOW | typeof BID;
 
-const SPECIAL = 'Special';
-const GOLD = 'Gold';
-const SILVER = 'Silver';
-const BRONZE = 'Bronze';
+export const SPECIAL = 'Special';
+export const GOLD = 'Gold';
+export const SILVER = 'Silver';
+export const BRONZE = 'Bronze';
 
 export type PLAYERS_QUALITY = typeof SPECIAL | typeof GOLD | typeof SILVER | typeof BRONZE;
 
 export interface PlayerConfig {
-    name: string
-    rating?: number
-    quality?: PLAYERS_QUALITY
-    bid?: Bid
-    buy_now?: BuyNow
+    name: string;
+    rating: number;
+    quality: PLAYERS_QUALITY;
+    bid?: Bid;
+    buyNow?: BuyNow;
 }
 
-export interface Bid {
-    min_bid_price: number
-    max_bid_price: number
-    min_buy_now_price: number
-    max_buy_now_price: number
-    max_expiration_time: number
+interface PlayerMarketPrices {
+    minBidPrice: number;
+    maxBidPrice: number;
+    minBuyNowPrice: number;
+    maxBuyNowPrice: number;
 }
 
-export interface BuyNow {
-    min_bid_price: number
-    max_bid_price: number
-    min_buy_now_price: number
-    max_buy_now_price: number
-    max_iterations: number
-    players_to_buy: number
+export interface Bid extends PlayerMarketPrices {
+    maxExpirationTime: number;
+}
+
+export interface BuyNow extends PlayerMarketPrices {
+    maxIterations: number;
+    playersTuBuy: number;
 }
