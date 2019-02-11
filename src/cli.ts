@@ -96,7 +96,6 @@ export const getConfigOperation = async ({buyNow, bid}: PlayerConfig): Promise<O
     }
 
     return operationToExecute;
-    // return Promise.reject('N/A Operation');
 };
 
 const confirmOperation = async (message: string, operation: OPERATION): Promise<OPERATION | null> => {
@@ -110,10 +109,4 @@ const confirmOperation = async (message: string, operation: OPERATION): Promise<
     ]);
 
     return result ? operation : null;
-
-    if (result) {
-        return operation;
-    } else {
-        return Promise.reject('Operation cancelled!');
-    }
 };
