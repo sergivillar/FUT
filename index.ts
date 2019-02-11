@@ -3,7 +3,7 @@ import {getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation}
 import puppeteer, {Page} from 'puppeteer';
 import chalk from 'chalk';
 import ProgressBar from './src/progress-bar';
-import {getRandomAwaitTime, playAudio} from './src/utils';
+import {getRandomAwaitTime, playCashAudio, playRatAudio} from './src/utils';
 import {
     goToMarketSection,
     goToMarket,
@@ -61,9 +61,10 @@ const buyAllPlayer = async (page: Page, playerConfig: PlayerConfig, operation: B
         const isPlayerBought = await buyPlayer(page, playerConfig.rating);
 
         if (isPlayerBought) {
-            await playAudio(page);
+            await playCashAudio(page);
             playersBought++;
         } else {
+            await playRatAudio(page);
             playerLost++;
         }
 
