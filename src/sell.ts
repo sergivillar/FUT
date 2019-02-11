@@ -1,6 +1,6 @@
 import { Page } from 'puppeteer';
 import { PlayerConfig, Sell } from './models';
-export const sell = async (playerConfig: PlayerConfig, operation: Sell, transferTargetsPage: Page) => {
+export const sell = async (playerConfig: PlayerConfig, operation: Sell, transferTargetsPage: Page): Promise<number> => {
     let ratingQuery = ''
     if (playerConfig.rating) {
         ratingQuery = ` and .//div[contains(text() , "${playerConfig.rating}")]`
@@ -36,9 +36,11 @@ export const sell = async (playerConfig: PlayerConfig, operation: Sell, transfer
             `//button[contains(text(),"List Item")]`
         )
         await transferTargetsPage.waitFor(500)
-        sellButton[0].click()
+        await sellButton[0].click()
         await transferTargetsPage.waitFor(500)
     }
+
+    return players.length
 }
 
 const typePriceInInput = async (transferTargetsPage: Page, price: number, titleFilter: string): Promise<void> => {

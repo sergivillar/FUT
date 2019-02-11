@@ -16,7 +16,7 @@ import {
     searchPlayer,
 } from './src/market-section';
 import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-import { OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL, Sell } from './src/models';
+import { OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL } from './src/models';
 
 let playersBought = 0;
 let playerLost = 0;
@@ -190,7 +190,8 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     }
     else if (operation === SELL && playerConfig.sell) {
         await goToTransferTargets(page)
-        await sell(playerConfig, playerConfig.sell, page)
+        const sold = await sell(playerConfig, playerConfig.sell, page)
+        console.log(`⏰ ${sold} players moved to active transfers...`);
     }
     else {
         console.log('Unknown operation: ' + operation)
