@@ -75,12 +75,7 @@ const buyAllPlayer = async (page: Page, playerConfig: PlayerConfig, operation: B
     }
 };
 
-const massiveBid = async (
-    page: Page,
-    playerConfig: PlayerConfig,
-    operation: Bid,
-    maxActiveBids: number
-) => {
+const massiveBid = async (page: Page, playerConfig: PlayerConfig, operation: Bid, maxActiveBids: number) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
     await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
@@ -150,11 +145,11 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         if (bid.max_buy_now_price > 0) {
             await setMaxBuyNowPrice(page, bid.max_buy_now_price);
         }
-    
+
         if (bid.min_bid_price > 0) {
             await setMinBidPrice(page, bid.min_bid_price);
         }
-    
+
         if (bid.max_bid_price > 0) {
             await setMaxBidPrice(page, bid.max_bid_price);
         }
@@ -176,11 +171,11 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         if (buyNow.max_buy_now_price > 0) {
             await setMaxBuyNowPrice(page, buyNow.max_buy_now_price);
         }
-    
+
         if (buyNow.min_bid_price > 0) {
             await setMinBidPrice(page, buyNow.min_bid_price);
         }
-    
+
         if (buyNow.max_bid_price > 0) {
             await setMaxBidPrice(page, buyNow.max_bid_price);
         }
