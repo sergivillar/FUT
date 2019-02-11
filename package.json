@@ -35,12 +35,15 @@
         "tslint-eslint-rules": "^5.4.0",
         "typescript": "^3.3.3"
     },
-    "lint-staged": {
-        "linters": {
-            "*.{js,json,md,ts}": [
-                "prettier --write",
-                "git add"
-            ]
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
         }
+    },
+    "lint-staged": {
+        "*.{js,json,md,ts}": [
+            "prettier --write",
+            "git add"
+        ]
     }
 }
