@@ -54,7 +54,25 @@ export const goToTransferTargets = async (page: Page): Promise<any> => {
     if (!checkTransferTargetsPageLoaded) {
         return await goToTransferTargets(page);
     }
-}
+};
+
+export const goToTransferList = async (page: Page): Promise<any> => {
+    await page.waitFor(getRandomAwaitTime());
+
+    const goToTransferListButton = await page.waitForXPath('//h1[contains(text(), "Transfer List")]');
+
+    if (!goToTransferListButton) {
+        return await goToTransferList(page);
+    }
+
+    await goToTransferListButton.asElement().click();
+
+    const checkTransferTargetsPageLoaded = await page.waitForXPath('//h2[contains(text(), "Transfers")]');
+
+    if (!checkTransferTargetsPageLoaded) {
+        return await goToTransferList(page);
+    }
+};
 
 export const clickBackButton = async (page: Page) => {
     await page.waitFor(200);

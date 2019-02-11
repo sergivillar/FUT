@@ -10,6 +10,7 @@ import {
     clickBackButton,
     clickNextPageButton,
     goToTransferTargets,
+    goToTransferList,
 } from './src/navigaton';
 import {
     setMinBuyNowPrice,
@@ -189,9 +190,24 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         Bar.init(buyNow.max_iterations);
         await buyAllPlayer(page, playerConfig, buyNow);
     } else if (operation === SELL && playerConfig.sell) {
-        await goToTransferTargets(page);
-        const sold = await sell(playerConfig, playerConfig.sell, page);
-        console.log(`⏰ ${sold} players moved to active transfers...`);
+        // FIXME: They cannot work together. In addition, test it from transfer targets please!
+
+        // // From transfer targets
+        // await goToTransferTargets(page);
+        // const soldInTransferTargets = await sell(playerConfig, playerConfig.sell, ['Won Items'], page);
+        // console.log(`⏰ ${soldInTransferTargets} players moved to active transfers...`);
+
+        // await clickBackButton(page);
+
+        // From transfer list
+        await goToTransferList(page);
+        const soldInTransferList = await sell(
+            playerConfig,
+            playerConfig.sell,
+            ['Unsold Items', 'Available Items'],
+            page
+        );
+        console.log(`⏰ Retrying to sell ${soldInTransferList} players...`);
     } else {
         console.log('Unknown operation: ' + operation);
     }
