@@ -100,7 +100,7 @@ const confirmOperation = async (message: string, operation: OPERATION): Promise<
         {
             type: 'confirm',
             name: 'result',
-            message,
+            message: message,
             default: true,
         },
     ]);
