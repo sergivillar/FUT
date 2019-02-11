@@ -1,9 +1,16 @@
+import {sell} from './src/sell';
 import {getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation} from './src/cli';
 import puppeteer, {Page} from 'puppeteer';
 import chalk from 'chalk';
 import ProgressBar from './src/progress-bar';
 import {getRandomAwaitTime, playAudio} from './src/utils';
-import {goToMarketSection, goToMarket, clickBackButton, clickNextPageButton} from './src/navigaton';
+import {
+    goToMarketSection,
+    goToMarket,
+    clickBackButton,
+    clickNextPageButton,
+    goToTransferTargets,
+} from './src/navigaton';
 import {
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
@@ -15,13 +22,13 @@ import {
     searchPlayer,
 } from './src/market-section';
 import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-import {OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid} from './src/models';
+import {OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL} from './src/models';
 
 let playersBought = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const maxActiveBids = 2;
+const MAX_ACTIVE_BIDS = 2;
 
 const Bar = new ProgressBar();
 
@@ -127,17 +134,17 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     }
 
     await goToMarketSection(page);
-    await goToMarket(page);
-
-    await typePlayerOnInput(page, playerConfig.name);
-    await selectPlayer(page, playerConfig.name);
-
-    if (playerConfig.quality) {
-        await changeQuality(page, playerConfig.quality);
-    }
 
     if (operation === BID && playerConfig.bid) {
         const bid = playerConfig.bid;
+        await goToMarket(page);
+
+        await typePlayerOnInput(page, playerConfig.name);
+        await selectPlayer(page, playerConfig.name);
+
+        if (playerConfig.quality) {
+            await changeQuality(page, playerConfig.quality);
+        }
         if (bid.min_buy_now_price > 0) {
             await setMinBuyNowPrice(page, bid.min_buy_now_price);
         }
@@ -152,9 +159,17 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         if (bid.max_bid_price > 0) {
             await setMaxBidPrice(page, bid.max_bid_price);
         }
-        await massiveBid(page, playerConfig, bid, maxActiveBids);
+        await massiveBid(page, playerConfig, bid, MAX_ACTIVE_BIDS);
     } else if (operation === BUY_NOW && playerConfig.buy_now) {
         const buyNow = playerConfig.buy_now;
+        await goToMarket(page);
+
+        await typePlayerOnInput(page, playerConfig.name);
+        await selectPlayer(page, playerConfig.name);
+
+        if (playerConfig.quality) {
+            await changeQuality(page, playerConfig.quality);
+        }
         if (buyNow.min_buy_now_price > 0) {
             await setMinBuyNowPrice(page, buyNow.min_buy_now_price);
         }
@@ -172,6 +187,10 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         console.log('🚀 Start hunting. Number of attempts: ', buyNow.max_iterations);
         Bar.init(buyNow.max_iterations);
         await buyAllPlayer(page, playerConfig, buyNow);
+    } else if (operation === SELL && playerConfig.sell) {
+        await goToTransferTargets(page);
+        const sold = await sell(playerConfig, playerConfig.sell, page);
+        console.log(`⏰ ${sold} players moved to active transfers...`);
     } else {
         console.log('Unknown operation: ' + operation);
     }
@@ -182,6 +201,6 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     if (menuAction === LOAD_PLAYER_CONFIG) {
         const playerConfig = await loadPlayerConfig();
         const operation = await getConfigOperation(playerConfig);
-        executeOperation(operation, playerConfig);
+        await executeOperation(operation, playerConfig);
     }
 })();

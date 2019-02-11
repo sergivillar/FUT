@@ -1,7 +1,8 @@
 export const BUY_NOW = 'Buy now';
 export const BID = 'Bid';
+export const SELL = 'Sell';
 
-export type OPERATION = typeof BUY_NOW | typeof BID;
+export type OPERATION = typeof BUY_NOW | typeof BID | typeof SELL;
 
 const SPECIAL = 'Special';
 const GOLD = 'Gold';
@@ -16,6 +17,7 @@ export interface PlayerConfig {
     quality?: PLAYERS_QUALITY
     bid?: Bid
     buy_now?: BuyNow
+    sell?: Sell
 }
 
 export interface Bid {
@@ -33,4 +35,8 @@ export interface BuyNow {
     max_buy_now_price: number
     max_iterations: number
     players_to_buy: number
+}
+
+export interface Sell {
+    price: number
 }

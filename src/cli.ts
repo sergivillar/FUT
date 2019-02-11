@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import {PlayerConfig, OPERATION, BID, BUY_NOW} from './models';
+import {PlayerConfig, OPERATION, BID, BUY_NOW, SELL} from './models';
 import {readConfigsInFolder, readPlayerConfig} from './config-files';
 
 export const LOAD_PLAYER_CONFIG = 'Load player config';
@@ -69,45 +69,37 @@ const printPlayerConfig = (playerConfig: PlayerConfig) => {
         console.log(`  - Max iterations: ${buyNow.max_iterations}`);
         console.log(`  - Players to buy: ${buyNow.players_to_buy}`);
     }
+    if (playerConfig.sell) {
+        console.log(chalk.underline('Sell config') + ':');
+        console.log(chalk(`  - Price: ${playerConfig.sell.price}`));
+    }
     console.log('\n');
 };
 
 export const getConfigOperation = async (playerConfig: PlayerConfig): Promise<OPERATION> => {
-    const hasBuyNow = playerConfig.buy_now != null;
-    const hasBid = playerConfig.bid != null;
-    if (hasBuyNow && hasBid) {
-        const {operation} = await inquirer.prompt([
-            {
-                type: 'list',
-                name: 'operation',
-                message: 'Which operation do you want to execute?',
-                choices: [BID, BUY_NOW],
-            },
-        ]);
-
-        return operation;
-    } else if (hasBuyNow) {
-        return confirmOperation('Do you want to execute the BUY NOW process?', BUY_NOW);
-    } else if (hasBid) {
-        return confirmOperation('Do you want to execute the BID process?', BID);
+    const operations = [];
+    if (playerConfig.bid) {
+        operations.push(BID);
+    }
+    if (playerConfig.buy_now) {
+        operations.push(BUY_NOW);
+    }
+    if (playerConfig.sell) {
+        operations.push(SELL);
     }
 
-    return Promise.reject('N/A Operation');
-};
+    if (operations.length === 0) {
+        return Promise.reject('No operations for the player config: ' + playerConfig.name);
+    }
 
-const confirmOperation = async (message: string, operation: OPERATION): Promise<OPERATION> => {
-    const {result} = await inquirer.prompt([
+    const {operation} = await inquirer.prompt([
         {
-            type: 'confirm',
-            name: 'result',
-            message: message,
-            default: true,
+            type: 'list',
+            name: 'operation',
+            message: 'Which operation do you want to execute?',
+            choices: operations,
         },
     ]);
 
-    if (result) {
-        return operation;
-    } else {
-        return Promise.reject('Operation cancelled!');
-    }
+    return operation;
 };
