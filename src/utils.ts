@@ -23,7 +23,7 @@ export const getSecondsFromTime = (expiredTimeText: string) => {
     }
     const multiplyBySeconds = TIME_TO_SECONDS[magnitudeTime];
 
-    return parseInt(expiredValue) * multiplyBySeconds;
+    return Number(expiredValue) * multiplyBySeconds;
 };
 
 export const playAudio = async (page: Page) => {

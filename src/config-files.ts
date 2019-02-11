@@ -1,5 +1,6 @@
 import fs from 'fs';
 import {PlayerConfig} from './models';
+// @ts-ignore
 import readYaml from 'read-yaml';
 
 const CONFIG_PLAYERS_FOLDER = './player-configs';
