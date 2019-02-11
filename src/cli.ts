@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import {PlayerConfig, OPERATION, BID, BUY_NOW} from './models';
-import playersConfig from '../player-configs/prueba';
+import playersConfig from '../player-configs/players';
 
 export const LOAD_PLAYER_CONFIG = 'Load player config';
 export const EXIT = 'Exit';
