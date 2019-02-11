@@ -1,10 +1,16 @@
-import { sell } from './src/sell';
-import { getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation } from './src/cli';
+import {sell} from './src/sell';
+import {getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation} from './src/cli';
 import puppeteer, {Page} from 'puppeteer';
 import chalk from 'chalk';
 import ProgressBar from './src/progress-bar';
 import {getRandomAwaitTime, playAudio} from './src/utils';
-import { goToMarketSection, goToMarket, clickBackButton, clickNextPageButton, goToTransferTargets } from './src/navigaton';
+import {
+    goToMarketSection,
+    goToMarket,
+    clickBackButton,
+    clickNextPageButton,
+    goToTransferTargets,
+} from './src/navigaton';
 import {
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
@@ -16,13 +22,13 @@ import {
     searchPlayer,
 } from './src/market-section';
 import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-import { OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL } from './src/models';
+import {OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL} from './src/models';
 
 let playersBought = 0;
 let playerLost = 0;
 let iteration = 0;
 
-const maxActiveBids = 2;
+const MAX_ACTIVE_BIDS = 2;
 
 const Bar = new ProgressBar();
 
@@ -130,7 +136,7 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     await goToMarketSection(page);
 
     if (operation === BID && playerConfig.bid) {
-        const bid = playerConfig.bid
+        const bid = playerConfig.bid;
         await goToMarket(page);
 
         await typePlayerOnInput(page, playerConfig.name);
@@ -153,10 +159,9 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         if (bid.max_bid_price > 0) {
             await setMaxBidPrice(page, bid.max_bid_price);
         }
-        await massiveBid(page, playerConfig, bid, maxActiveBids);
-    }
-    else if (operation === BUY_NOW && playerConfig.buy_now) {
-        const buyNow = playerConfig.buy_now
+        await massiveBid(page, playerConfig, bid, MAX_ACTIVE_BIDS);
+    } else if (operation === BUY_NOW && playerConfig.buy_now) {
+        const buyNow = playerConfig.buy_now;
         await goToMarket(page);
 
         await typePlayerOnInput(page, playerConfig.name);
@@ -182,22 +187,20 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
         console.log('🚀 Start hunting. Number of attempts: ', buyNow.max_iterations);
         Bar.init(buyNow.max_iterations);
         await buyAllPlayer(page, playerConfig, buyNow);
-    }
-    else if (operation === SELL && playerConfig.sell) {
-        await goToTransferTargets(page)
-        const sold = await sell(playerConfig, playerConfig.sell, page)
+    } else if (operation === SELL && playerConfig.sell) {
+        await goToTransferTargets(page);
+        const sold = await sell(playerConfig, playerConfig.sell, page);
         console.log(`⏰ ${sold} players moved to active transfers...`);
+    } else {
+        console.log('Unknown operation: ' + operation);
     }
-    else {
-        console.log('Unknown operation: ' + operation)
-    }
-}
+};
 
 (async () => {
     const menuAction = await getMenuAction();
     if (menuAction === LOAD_PLAYER_CONFIG) {
-        const playerConfig = await loadPlayerConfig()
-        const operation = await getConfigOperation(playerConfig)
-        await executeOperation(operation, playerConfig)
+        const playerConfig = await loadPlayerConfig();
+        const operation = await getConfigOperation(playerConfig);
+        await executeOperation(operation, playerConfig);
     }
 })();

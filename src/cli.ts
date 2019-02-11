@@ -77,22 +77,22 @@ const printPlayerConfig = (playerConfig: PlayerConfig) => {
 };
 
 export const getConfigOperation = async (playerConfig: PlayerConfig): Promise<OPERATION> => {
-    let operations = []
+    const operations = [];
     if (playerConfig.bid) {
-        operations.push(BID)
+        operations.push(BID);
     }
     if (playerConfig.buy_now) {
-        operations.push(BUY_NOW)
+        operations.push(BUY_NOW);
     }
     if (playerConfig.sell) {
-        operations.push(SELL)
+        operations.push(SELL);
     }
 
-    if (operations.length == 0) {
-        return Promise.reject("No operations for the player config: " + playerConfig.name)
+    if (operations.length === 0) {
+        return Promise.reject('No operations for the player config: ' + playerConfig.name);
     }
-    
-    const { operation } = await inquirer.prompt([
+
+    const {operation} = await inquirer.prompt([
         {
             type: 'list',
             name: 'operation',
@@ -101,5 +101,5 @@ export const getConfigOperation = async (playerConfig: PlayerConfig): Promise<OP
         },
     ]);
 
-    return operation
-}
+    return operation;
+};
