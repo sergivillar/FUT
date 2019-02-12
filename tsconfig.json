@@ -17,7 +17,9 @@
         "allowSyntheticDefaultImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "module": "CommonJS"
     },
     "include": ["index.ts", "src"]
 }

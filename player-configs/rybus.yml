@@ -1,7 +1,7 @@
 name: 'Maciej Rybus'
 bid:
-  min_bid_price: 0
-  max_bid_price: 650
-  min_buy_now_price: 0
-  max_buy_now_price: 0
-  max_expiration_time: 8600
+    minBidPrice: 0
+    maxBidPrice: 650
+    min_buy_now_price: 0
+    max_buy_now_price: 0
+    max_expiration_time: 8600
