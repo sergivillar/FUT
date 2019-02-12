@@ -21,13 +21,14 @@ export interface PlayerConfig {
 }
 
 interface PlayerMarketPrices {
-    minBidPrice: number;
-    maxBidPrice: number;
-    minBuyNowPrice: number;
-    maxBuyNowPrice: number;
+    minBidPrice?: number;
+    maxBidPrice?: number;
+    minBuyNowPrice?: number;
+    maxBuyNowPrice?: number;
 }
 
 export interface Bid extends PlayerMarketPrices {
+    maxBidPrice: number;
     maxExpirationTime: number;
 }
 
