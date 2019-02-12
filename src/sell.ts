@@ -1,16 +1,15 @@
 import {Page} from 'puppeteer';
-import {PlayerConfig, Sell} from './models';
-export const sell = async (
-    playerConfig: PlayerConfig,
+import {Sell} from './models';
+
+export default async (
+    rating: number,
+    name: string,
     operation: Sell,
     transferTargetsPage: Page
 ): Promise<number> => {
-    let ratingQuery = '';
-    if (playerConfig.rating) {
-        ratingQuery = ` and .//div[contains(text() , "${playerConfig.rating}")]`;
-    }
+    const ratingQuery = ` and .//div[contains(text() , "${rating}")]`;
     const orPreffix = 'or ';
-    const nameTokens = playerConfig.name.split(' ').map(word => {
+    const nameTokens = name.split(' ').map(word => {
         return `${orPreffix}.//div[contains(text() , "${word}")]`;
     });
     const nameQuery = nameTokens.join(' ').substr(orPreffix.length);
@@ -55,8 +54,8 @@ const typePriceInInput = async (
     );
     await startPriceInput[0].click();
     await transferTargetsPage.waitFor(500);
-    const startPrice = String(price);
-    return startPriceInput[0].type(startPrice, {
+
+    return startPriceInput[0].type(String(price), {
         delay: 80,
     });
 };

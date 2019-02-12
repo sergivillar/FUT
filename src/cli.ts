@@ -41,21 +41,19 @@ const selectPlayerName = async (names: string[]): Promise<string> => {
     return configFile;
 };
 
-const printPlayerConfig = (playerConfig: PlayerConfig) => {
+const printPlayerConfig = ({name, rating, quality, bid, buyNow, sell}: PlayerConfig) => {
     console.log('\n');
+    console.log(chalk.bold(`Player name: ${name}`));
 
-    console.log(chalk.bold(`Player name: ${playerConfig.name}`));
-
-    if (playerConfig.rating) {
-        console.log(`Rating: ${playerConfig.rating}`);
+    if (rating) {
+        console.log(`Rating: ${rating}`);
     }
 
-    if (playerConfig.quality) {
-        console.log(`Player quality: ${playerConfig.quality}`);
+    if (quality) {
+        console.log(`Player quality: ${quality}`);
     }
 
-    if (playerConfig.bid) {
-        const bid = playerConfig.bid;
+    if (bid) {
         console.log(chalk.underline('Bids config') + ':');
         console.log(`  - Min bid price: ${bid.minBidPrice}`);
         console.log(`  - Max bid price: ${bid.maxBidPrice}`);
@@ -63,8 +61,8 @@ const printPlayerConfig = (playerConfig: PlayerConfig) => {
         console.log(`  - Max buy now price: ${bid.maxBuyNowPrice}`);
         console.log(`  - Max expiration time (seconds): ${bid.maxExpirationTime}`);
     }
-    if (playerConfig.buyNow) {
-        const buyNow = playerConfig.buyNow;
+
+    if (buyNow) {
         console.log(chalk.underline('Buy now config') + ':');
         console.log(`  - Min bid price: ${buyNow.minBidPrice}`);
         console.log(`  - Max bid price: ${buyNow.maxBidPrice}`);
@@ -73,27 +71,30 @@ const printPlayerConfig = (playerConfig: PlayerConfig) => {
         console.log(`  - Max iterations: ${buyNow.maxIterations}`);
         console.log(`  - Players to buy: ${buyNow.playersToBuy}`);
     }
-    if (playerConfig.sell) {
+
+    if (sell) {
         console.log(chalk.underline('Sell config') + ':');
-        console.log(chalk(`  - Price: ${playerConfig.sell.price}`));
+        console.log(`  - Price: ${sell.price}`);
     }
+
     console.log('\n');
 };
 
-export const getConfigOperation = async (playerConfig: PlayerConfig): Promise<OPERATION> => {
+export const getConfigOperation = async ({bid, buyNow, sell, name}: PlayerConfig): Promise<OPERATION> => {
     const operations = [];
-    if (playerConfig.bid) {
+
+    if (bid) {
         operations.push(BID);
     }
-    if (playerConfig.buyNow) {
+    if (buyNow) {
         operations.push(BUY_NOW);
     }
-    if (playerConfig.sell) {
+    if (sell) {
         operations.push(SELL);
     }
 
     if (operations.length === 0) {
-        return Promise.reject('No operations for the player config: ' + playerConfig.name);
+        return Promise.reject('No operations for the player config: ' + name);
     }
 
     const {operation} = await inquirer.prompt([
