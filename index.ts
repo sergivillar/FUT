@@ -107,6 +107,7 @@ const massiveBidRecursion = async (
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
+        await page.waitFor(500);
         await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
     } else {
         await bidPlayer(page, operation.max_bid_price, operation.max_expiration_time, playerConfig.rating);
@@ -194,6 +195,7 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
 
         // From transfer targets
         await goToTransferTargets(page);
+        await page.waitFor(500);
         const putOnSaleFromTransferTargets = await sell(playerConfig, playerConfig.sell, ['Won Items'], page);
 
         await clickBackButton(page);
