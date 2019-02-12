@@ -38,6 +38,24 @@ export const goToMarket = async (page: Page): Promise<any> => {
     }
 };
 
+export const goToTransferTargets = async (page: Page): Promise<any> => {
+    await page.waitFor(getRandomAwaitTime());
+
+    const goToTransferTargetsButton = await page.waitForXPath('//h1[contains(text(), "Transfer Targets")]');
+
+    if (!goToTransferTargetsButton) {
+        return await goToTransferTargets(page);
+    }
+
+    await goToTransferTargetsButton.asElement().click();
+
+    const checkTransferTargetsPageLoaded = await page.waitForXPath('//h2[contains(text(), "Active Bids")]');
+
+    if (!checkTransferTargetsPageLoaded) {
+        return await goToTransferTargets(page);
+    }
+}
+
 export const clickBackButton = async (page: Page) => {
     await page.waitFor(200);
     await page.$('.btn-navigation');

@@ -16,5 +16,7 @@
 #   max_buy_now_price: 0
 #   max_iterations: 100
 #   players_to_buy: 0
+# sell:
+#   price: 0
 
 # =====================================
