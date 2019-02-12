@@ -2,7 +2,6 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import playersConfig from '../player-configs/players';
 import {PlayerConfig, OPERATION, BID, BUY_NOW, SELL} from './models';
-import {readConfigsInFolder, readPlayerConfig} from './config-files';
 
 export const LOAD_PLAYER_CONFIG = 'Load player config';
 export const EXIT = 'Exit';
@@ -72,7 +71,7 @@ const printPlayerConfig = (playerConfig: PlayerConfig) => {
         console.log(`  - Min buy now price: ${buyNow.minBuyNowPrice}`);
         console.log(`  - Max buy now price: ${buyNow.maxBuyNowPrice}`);
         console.log(`  - Max iterations: ${buyNow.maxIterations}`);
-        console.log(`  - Players to buy: ${buyNow.playersTuBuy}`);
+        console.log(`  - Players to buy: ${buyNow.playersToBuy}`);
     }
     if (playerConfig.sell) {
         console.log(chalk.underline('Sell config') + ':');
@@ -86,7 +85,7 @@ export const getConfigOperation = async (playerConfig: PlayerConfig): Promise<OP
     if (playerConfig.bid) {
         operations.push(BID);
     }
-    if (playerConfig.buy_now) {
+    if (playerConfig.buyNow) {
         operations.push(BUY_NOW);
     }
     if (playerConfig.sell) {

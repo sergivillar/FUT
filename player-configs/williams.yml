@@ -1,9 +1,9 @@
 name: 'Williams'
 bid:
-  min_bid_price: 0
-  max_bid_price: 850
-  min_buy_now_price: 0
-  max_buy_now_price: 0
-  max_expiration_time: 3600
+    minBidPrice: 0
+    maxBidPrice: 850
+    min_buy_now_price: 0
+    max_buy_now_price: 0
+    max_expiration_time: 3600
 sell:
-  price: 1500
+    price: 1500

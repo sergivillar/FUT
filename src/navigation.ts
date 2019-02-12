@@ -54,7 +54,7 @@ export const goToTransferTargets = async (page: Page): Promise<any> => {
     if (!checkTransferTargetsPageLoaded) {
         return await goToTransferTargets(page);
     }
-}
+};
 
 export const clickBackButton = async (page: Page) => {
     await page.waitFor(200);

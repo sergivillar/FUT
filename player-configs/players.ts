@@ -12,6 +12,7 @@ const players: PlayerConfig[] = [
             maxBuyNowPrice: 0,
             maxExpirationTime: 4600,
         },
+        sell: {price: 100},
     },
 ];
 

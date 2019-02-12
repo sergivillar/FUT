@@ -1,8 +1,8 @@
 name: 'Escudero'
 rating: 79
 bid:
-  min_bid_price: 0
-  max_bid_price: 400
-  min_buy_now_price: 0
-  max_buy_now_price: 0
-  max_expiration_time: 4600
+    minBidPrice: 0
+    maxBidPrice: 400
+    min_buy_now_price: 0
+    max_buy_now_price: 0
+    max_expiration_time: 4600
