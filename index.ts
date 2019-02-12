@@ -192,22 +192,21 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
     } else if (operation === SELL && playerConfig.sell) {
         // FIXME: They cannot work together. In addition, test it from transfer targets please!
 
-        // // From transfer targets
-        // await goToTransferTargets(page);
-        // const soldInTransferTargets = await sell(playerConfig, playerConfig.sell, ['Won Items'], page);
-        // console.log(`⏰ ${soldInTransferTargets} players moved to active transfers...`);
+        // From transfer targets
+        await goToTransferTargets(page);
+        const putOnSaleFromTransferTargets = await sell(playerConfig, playerConfig.sell, ['Won Items'], page);
 
-        // await clickBackButton(page);
+        await clickBackButton(page);
 
         // From transfer list
         await goToTransferList(page);
-        const soldInTransferList = await sell(
+        const putOnSaleFromTransferList = await sell(
             playerConfig,
             playerConfig.sell,
             ['Unsold Items', 'Available Items'],
             page
         );
-        console.log(`⏰ Retrying to sell ${soldInTransferList} players...`);
+        console.log(`⏰ Put on sale ${putOnSaleFromTransferList + putOnSaleFromTransferTargets} players...`);
     } else {
         console.log('Unknown operation: ' + operation);
     }

@@ -10,16 +10,23 @@ export const sell = async (playerConfig: PlayerConfig, operation: Sell, sections
     const namesQuery = concatenate(containsNames, 'or');
 
     const ratingQueryIfNeeded = playerConfig.rating
-        ? ` and .//div[contains(text(), "${playerConfig.rating}")`
+        ? ` and .//div[contains(text(), "${playerConfig.rating}")]`
         : ``;
 
-    const xpath = `//h2[(${sectionsQuery})]/parent::header/parent::section//li[contains(@class, "listFUTItem") and .//div[${namesQuery}]${ratingQueryIfNeeded}]]`;
+    while (true) {
+        // The page is reloaded every time we put on sale a player,
+        // so we need to get the player rows again
 
-    const players = await page.$x(xpath);
+        const xpath = `//h2[(${sectionsQuery})]/parent::header/parent::section//li[contains(@class, "listFUTItem") and .//div[${namesQuery}]${ratingQueryIfNeeded}]`;
+        const players = await page.$x(xpath);
 
-    await sellPlayers(players, operation.price, page);
-
-    return players.length;
+        if (players.length > 0) {
+            await sellPlayer(players[0], operation.price, page);
+        } else {
+            break;
+        }
+    }
+    return 2;
 };
 
 const concatenate = (elements: string[], operator: string): string => {
@@ -32,18 +39,15 @@ const concatenate = (elements: string[], operator: string): string => {
         .substr(preffix.length);
 };
 
-const sellPlayers = async (players: ElementHandle[], price: number, page: Page) => {
-    for (const player of players) {
-        await player.click();
+const sellPlayer = async (player: ElementHandle, price: number, page: Page) => {
+    await player.click();
 
-        await page.waitFor(500);
+    const listButton = await page.waitForXPath(
+        `//span[contains(text(), "List on Transfer Market") or contains(text(), "Re-list Item")]`
+    );
 
-        const listButton = await page.$x(
-            `//span[contains(text(), "List on Transfer Market") or contains(text(), "Re-list Item")]`
-        );
-        await page.waitFor(500);
-        await listButton[0].click();
-        await page.waitFor(500);
+    if (listButton) {
+        await listButton.click();
 
         // Sibling input of "Start price"
         await typePriceInInput(page, price, 'Start Price');
@@ -51,11 +55,17 @@ const sellPlayers = async (players: ElementHandle[], price: number, page: Page) 
         // Sibling input of "Buy now price"
         await typePriceInInput(page, price, 'Buy Now Price');
 
-        // const sellButton = await page.$x(`//button[contains(text(),"List Item")]`);
-        await page.waitFor(500);
-        // await sellButton[0].click();
-        console.log('Sell!');
-        await page.waitFor(500);
+        const sellButton = await page.waitForXPath(`//button[contains(text(),"List Item")]`);
+        if (sellButton) {
+            // console.log(sellButton);
+            await sellButton.click();
+            console.log('On sale!');
+            await page.waitFor(1000);
+        } else {
+            console.log('sellButton cannot be found');
+        }
+    } else {
+        console.log('listButton cannot be found');
     }
 };
 
@@ -64,6 +74,7 @@ const typePriceInInput = async (
     price: number,
     titleFilter: string
 ): Promise<void> => {
+    await transferTargetsPage.waitFor(1000);
     const startPriceInput = await transferTargetsPage.$x(
         `.//span[contains(text(), "${titleFilter}")]/parent::div/parent::div//input[contains(@class, "numericInput")]`
     );
