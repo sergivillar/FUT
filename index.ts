@@ -139,6 +139,8 @@ const executeOperation = async (
             page
         );
         console.log(`⏰ Put on sale ${putOnSaleFromTransferList + putOnSaleFromTransferTargets} players...`);
+
+        await clickBackButton(page);
     } else {
         console.log('Unknown operation: ' + operation);
     }
