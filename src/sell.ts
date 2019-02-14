@@ -16,6 +16,7 @@ export default async (
 
     const ratingQueryIfNeeded = rating ? ` and .//div[contains(text(), "${rating}")]` : ``;
 
+    let playersOnSale = 0;
     while (true) {
         // The page is reloaded every time we put on sale a player,
         // so we need to get the player rows again
@@ -24,12 +25,13 @@ export default async (
         const players = await page.$x(xpath);
 
         if (players.length > 0) {
-            await sellPlayer(players[0], operation.price, page);
+            const onSale = await sellPlayer(players[0], operation.price, page);
+            playersOnSale += onSale ? 1 : 0;
         } else {
             break;
         }
     }
-    return 2;
+    return playersOnSale;
 };
 
 const concatenate = (elements: string[], operator: string): string => {
@@ -42,7 +44,7 @@ const concatenate = (elements: string[], operator: string): string => {
         .substr(preffix.length);
 };
 
-const sellPlayer = async (player: ElementHandle, price: number, page: Page) => {
+const sellPlayer = async (player: ElementHandle, price: number, page: Page): boolean => {
     await player.click();
 
     const listButton = await page.waitForXPath(
@@ -64,12 +66,15 @@ const sellPlayer = async (player: ElementHandle, price: number, page: Page) => {
             await sellButton.click();
             console.log('On sale!');
             await page.waitFor(1000);
+            return true;
         } else {
             console.log('sellButton cannot be found');
         }
     } else {
         console.log('listButton cannot be found');
     }
+
+    return false;
 };
 
 const typePriceInInput = async (
