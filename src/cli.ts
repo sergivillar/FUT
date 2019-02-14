@@ -21,7 +21,7 @@ export const getMenuAction = async (): Promise<MENU_ACTION> => {
 };
 
 export const loadPlayerConfig = async (): Promise<PlayerConfig> => {
-    const playersNames = playersConfig.map(({name}) => name);
+    const playersNames = playersConfig.map(({name}) => name).sort((lhs, rhs) => lhs.localeCompare(rhs));
     const selectedPlayerName = await selectPlayerName(playersNames);
     const selectedPlayer = playersConfig.find(({name}) => name === selectedPlayerName) as PlayerConfig;
     printPlayerConfig(selectedPlayer);
