@@ -7,10 +7,10 @@ const players: PlayerConfig[] = [
         rating: 84,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 2900,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 3000,
@@ -25,10 +25,10 @@ const players: PlayerConfig[] = [
         rating: 84,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 3000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 3000,
@@ -43,10 +43,10 @@ const players: PlayerConfig[] = [
         rating: 85,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 3000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 10000,
@@ -61,10 +61,10 @@ const players: PlayerConfig[] = [
         rating: 85,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 9800,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 10000,
@@ -79,10 +79,10 @@ const players: PlayerConfig[] = [
         rating: 85,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 10000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 10000,
@@ -97,10 +97,10 @@ const players: PlayerConfig[] = [
         rating: 85,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 10000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 10000,
@@ -118,7 +118,7 @@ const players: PlayerConfig[] = [
             maxBidPrice: 350,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 4600,
+            maxExpirationTime: 3600,
         },
         buyNow: {
             maxBuyNowPrice: 24000,
