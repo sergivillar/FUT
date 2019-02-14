@@ -44,7 +44,7 @@ const concatenate = (elements: string[], operator: string): string => {
         .substr(preffix.length);
 };
 
-const sellPlayer = async (player: ElementHandle, price: number, page: Page): boolean => {
+const sellPlayer = async (player: ElementHandle, price: number, page: Page): Promise<boolean> => {
     await player.click();
 
     const listButton = await page.waitForXPath(

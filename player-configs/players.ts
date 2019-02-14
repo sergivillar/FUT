@@ -127,7 +127,6 @@ const players: PlayerConfig[] = [
         },
         sell: {price: 100},
     },
-    //
     {
         name: 'Emmanuel Adebayor',
         quality: GOLD,
@@ -144,7 +143,7 @@ const players: PlayerConfig[] = [
             maxIterations: 350,
             playersToBuy: 1,
         },
-        sell: {price: 1200},
+        sell: {price: 1100},
     },
     {
         name: 'Igor Akinfeev',
