@@ -1,7 +1,0 @@
-name: 'Ousmane Dembélé'
-bid:
-    minBidPrice: 0
-    maxBidPrice: 850
-    min_buy_now_price: 0
-    max_buy_now_price: 0
-    max_expiration_time: 3600

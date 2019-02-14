@@ -1,9 +1,0 @@
-name: 'Sébastien Corchia'
-bid:
-    minBidPrice: 0
-    maxBidPrice: 350
-    min_buy_now_price: 0
-    max_buy_now_price: 0
-    max_expiration_time: 3600
-sell:
-    price: 1000
