@@ -235,6 +235,60 @@ const players: PlayerConfig[] = [
         },
         sell: {price: 500000},
     },
+    {
+        name: 'Lucas Hernández',
+        quality: GOLD,
+        rating: 82,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 3500,
+            minBuyNowPrice: 0,
+            maxBuyNowPrice: 0,
+            maxExpirationTime: 3600,
+        },
+        buyNow: {
+            maxBuyNowPrice: 3500,
+            maxIterations: 350,
+            playersToBuy: 4,
+        },
+        sell: {price: 6000},
+    },
+    {
+        name: 'Raúl García',
+        quality: GOLD,
+        rating: 81,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 700,
+            minBuyNowPrice: 0,
+            maxBuyNowPrice: 0,
+            maxExpirationTime: 3600,
+        },
+        buyNow: {
+            maxBuyNowPrice: 700,
+            maxIterations: 350,
+            playersToBuy: 4,
+        },
+        sell: {price: 1200},
+    },
+    {
+        name: 'Raúl García',
+        quality: SPECIAL,
+        rating: 81,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 700,
+            minBuyNowPrice: 0,
+            maxBuyNowPrice: 0,
+            maxExpirationTime: 3600,
+        },
+        buyNow: {
+            maxBuyNowPrice: 700,
+            maxIterations: 350,
+            playersToBuy: 4,
+        },
+        sell: {price: 1200},
+    },
 ];
 
 export default players;
