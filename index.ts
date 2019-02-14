@@ -1,9 +1,8 @@
-import {sell} from './src/sell';
+import buyPlayer from './src/buy';
+import sellPlayer from './src/sell';
 import {getMenuAction, loadPlayerConfig, LOAD_PLAYER_CONFIG, getConfigOperation} from './src/cli';
 import puppeteer, {Page} from 'puppeteer';
-import chalk from 'chalk';
-import ProgressBar from './src/progress-bar';
-import {getRandomAwaitTime, playCashAudio, playRatAudio} from './src/utils';
+import {getRandomAwaitTime} from './src/utils';
 import {
     goToMarketSection,
     goToMarket,
@@ -11,7 +10,7 @@ import {
     clickNextPageButton,
     goToTransferTargets,
     goToTransferList,
-} from './src/navigaton';
+} from './src/navigation';
 import {
     setMinBuyNowPrice,
     setMaxBuyNowPrice,
@@ -22,79 +21,16 @@ import {
     selectPlayer,
     searchPlayer,
 } from './src/market-section';
-import {isNoResultBanner, buyPlayer, bidPlayer} from './src/market-players';
-import {OPERATION, BID, BUY_NOW, PlayerConfig, BuyNow, Bid, SELL} from './src/models';
+import {isNoResultBanner, bidPlayer} from './src/market-players';
+import {OPERATION, BID, BUY_NOW, PlayerConfig, Bid, SELL} from './src/models';
 
-let playersBought = 0;
-let playerLost = 0;
-let iteration = 0;
-
-const MAX_ACTIVE_BIDS = 2;
-
-const Bar = new ProgressBar();
-
-const buyAllPlayer = async (page: Page, playerConfig: PlayerConfig, operation: BuyNow) => {
-    Bar.update(iteration++);
-
-    if (iteration > operation.max_iterations) {
-        console.log('\n\n');
-        console.log(chalk.blue(`💸 Iterations end. Attempts: ${operation.max_iterations}`));
-        console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
-        console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
-        return process.exit(0);
-    }
-
+const massiveBid = async (page: Page, rating: number, operation: Bid) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
     await searchPlayer(page);
-
-    await Promise.race([
-        page.waitFor('.listFUTItem'),
-        page.waitForXPath('//h2[contains(text(), "No results found")]'),
-    ]);
-
-    const isPlayerNotFound = await isNoResultBanner(page);
-    await page.waitFor(getRandomAwaitTime(250, 350));
-
-    if (isPlayerNotFound) {
-        await clickBackButton(page);
-        await buyAllPlayer(page, playerConfig, operation);
-    } else {
-        const isPlayerBought = await buyPlayer(page, playerConfig.rating);
-
-        if (isPlayerBought) {
-            await playCashAudio(page);
-            playersBought++;
-        } else {
-            await playRatAudio(page);
-            playerLost++;
-        }
-
-        if (playersBought === operation.players_to_buy) {
-            console.log('\n\n');
-            console.log(chalk.blue(`💸 All players neede bought in ${operation.max_iterations} attempts: `));
-            console.log(chalk.green(`🔥 Total players bought : ${playersBought}`));
-            console.log(chalk.red(`🐀 Total players stolen by a rat kid : ${playerLost}`));
-            return process.exit(0);
-        }
-
-        await clickBackButton(page);
-
-        await buyAllPlayer(page, playerConfig, operation);
-    }
+    await massiveBidRecursion(page, rating, operation);
 };
 
-const massiveBid = async (page: Page, playerConfig: PlayerConfig, operation: Bid, maxActiveBids: number) => {
-    await page.waitFor(getRandomAwaitTime(300, 400));
-    await searchPlayer(page);
-    await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
-};
-
-const massiveBidRecursion = async (
-    page: Page,
-    playerConfig: PlayerConfig,
-    operation: Bid,
-    maxActiveBids: number
-) => {
+const massiveBidRecursion = async (page: Page, rating: number, operation: Bid) => {
     await page.waitFor(getRandomAwaitTime(300, 400));
 
     await Promise.race([
@@ -107,18 +43,20 @@ const massiveBidRecursion = async (
 
     if (isPlayerNotFound) {
         await clickBackButton(page);
-        await page.waitFor(500);
-        await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
+        await massiveBidRecursion(page, rating, operation);
     } else {
-        await bidPlayer(page, operation.max_bid_price, operation.max_expiration_time, playerConfig.rating);
+        await bidPlayer(page, operation.maxBidPrice, operation.maxExpirationTime, rating);
 
         await clickNextPageButton(page);
 
-        await massiveBidRecursion(page, playerConfig, operation, maxActiveBids);
+        await massiveBidRecursion(page, rating, operation);
     }
 };
 
-const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig) => {
+const executeOperation = async (
+    operation: OPERATION,
+    {name, quality, rating, bid, buyNow, sell}: PlayerConfig
+) => {
     const browser = await puppeteer.launch({
         headless: false,
         args: ['--user-data-dir=tmp/chrome-data'],
@@ -138,73 +76,65 @@ const executeOperation = async (operation: OPERATION, playerConfig: PlayerConfig
 
     await goToMarketSection(page);
 
-    if (operation === BID && playerConfig.bid) {
-        const bid = playerConfig.bid;
+    if (operation === BID || operation === BUY_NOW) {
         await goToMarket(page);
 
-        await typePlayerOnInput(page, playerConfig.name);
-        await selectPlayer(page, playerConfig.name);
+        await typePlayerOnInput(page, name);
+        await selectPlayer(page, name);
 
-        if (playerConfig.quality) {
-            await changeQuality(page, playerConfig.quality);
-        }
-        if (bid.min_buy_now_price > 0) {
-            await setMinBuyNowPrice(page, bid.min_buy_now_price);
-        }
-        if (bid.max_buy_now_price > 0) {
-            await setMaxBuyNowPrice(page, bid.max_buy_now_price);
+        if (quality) {
+            await changeQuality(page, quality);
         }
 
-        if (bid.min_bid_price > 0) {
-            await setMinBidPrice(page, bid.min_bid_price);
-        }
+        if (operation === BID && bid) {
+            if (bid.minBuyNowPrice) {
+                await setMinBuyNowPrice(page, bid.minBuyNowPrice);
+            }
+            if (bid.maxBuyNowPrice) {
+                await setMaxBuyNowPrice(page, bid.maxBuyNowPrice);
+            }
 
-        if (bid.max_bid_price > 0) {
-            await setMaxBidPrice(page, bid.max_bid_price);
-        }
-        await massiveBid(page, playerConfig, bid, MAX_ACTIVE_BIDS);
-    } else if (operation === BUY_NOW && playerConfig.buy_now) {
-        const buyNow = playerConfig.buy_now;
-        await goToMarket(page);
+            if (bid.minBidPrice) {
+                await setMinBidPrice(page, bid.minBidPrice);
+            }
 
-        await typePlayerOnInput(page, playerConfig.name);
-        await selectPlayer(page, playerConfig.name);
+            if (bid.maxBidPrice) {
+                await setMaxBidPrice(page, bid.maxBidPrice);
+            }
 
-        if (playerConfig.quality) {
-            await changeQuality(page, playerConfig.quality);
-        }
-        if (buyNow.min_buy_now_price > 0) {
-            await setMinBuyNowPrice(page, buyNow.min_buy_now_price);
-        }
-        if (buyNow.max_buy_now_price > 0) {
-            await setMaxBuyNowPrice(page, buyNow.max_buy_now_price);
-        }
+            await massiveBid(page, rating, bid);
+        } else if (operation === BUY_NOW && buyNow) {
+            if (buyNow.minBuyNowPrice) {
+                await setMinBuyNowPrice(page, buyNow.minBuyNowPrice);
+            }
+            if (buyNow.maxBuyNowPrice) {
+                await setMaxBuyNowPrice(page, buyNow.maxBuyNowPrice);
+            }
 
-        if (buyNow.min_bid_price > 0) {
-            await setMinBidPrice(page, buyNow.min_bid_price);
-        }
+            if (buyNow.minBidPrice) {
+                await setMinBidPrice(page, buyNow.minBidPrice);
+            }
 
-        if (buyNow.max_bid_price > 0) {
-            await setMaxBidPrice(page, buyNow.max_bid_price);
-        }
-        console.log('🚀 Start hunting. Number of attempts: ', buyNow.max_iterations);
-        Bar.init(buyNow.max_iterations);
-        await buyAllPlayer(page, playerConfig, buyNow);
-    } else if (operation === SELL && playerConfig.sell) {
-        // FIXME: They cannot work together. In addition, test it from transfer targets please!
+            if (buyNow.maxBidPrice) {
+                await setMaxBidPrice(page, buyNow.maxBidPrice);
+            }
 
+            await buyPlayer(page, rating, buyNow);
+        }
+    } else if (operation === SELL && sell) {
         // From transfer targets
         await goToTransferTargets(page);
         await page.waitFor(500);
-        const putOnSaleFromTransferTargets = await sell(playerConfig, playerConfig.sell, ['Won Items'], page);
+        const putOnSaleFromTransferTargets = await sellPlayer(rating, name, sell, ['Won Items'], page);
 
         await clickBackButton(page);
 
         // From transfer list
         await goToTransferList(page);
-        const putOnSaleFromTransferList = await sell(
-            playerConfig,
-            playerConfig.sell,
+        const putOnSaleFromTransferList = await sellPlayer(
+            rating,
+            name,
+            sell,
             ['Unsold Items', 'Available Items'],
             page
         );

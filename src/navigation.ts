@@ -49,7 +49,9 @@ export const goToTransferTargets = async (page: Page): Promise<any> => {
 
     await goToTransferTargetsButton.asElement().click();
 
-    const checkTransferTargetsPageLoaded = await page.waitForXPath('//h2[contains(text(), "Active Bids")]');
+    const checkTransferTargetsPageLoaded = await page.waitForXPath(
+        '//h2[contains(text(), "Transfers Targets")]'
+    );
 
     if (!checkTransferTargetsPageLoaded) {
         return await goToTransferTargets(page);
@@ -67,9 +69,9 @@ export const goToTransferList = async (page: Page): Promise<any> => {
 
     await goToTransferListButton.asElement().click();
 
-    const checkTransferTargetsPageLoaded = await page.waitForXPath('//h2[contains(text(), "Transfers")]');
+    const checkTransferListPageLoaded = await page.waitForXPath('//h2[contains(text(), "Transfers")]');
 
-    if (!checkTransferTargetsPageLoaded) {
+    if (!checkTransferListPageLoaded) {
         return await goToTransferList(page);
     }
 };

@@ -1,17 +1,20 @@
-import {Page} from 'puppeteer';
-import {PlayerConfig, Sell} from './models';
-import {ElementHandle} from 'puppeteer';
+import {Page, ElementHandle} from 'puppeteer';
+import {Sell} from './models';
 
-export const sell = async (playerConfig: PlayerConfig, operation: Sell, sections: string[], page: Page) => {
+export default async (
+    rating: number,
+    name: string,
+    operation: Sell,
+    sections: string[],
+    page: Page
+): Promise<number> => {
     const containsSections = sections.map(section => `contains(text(), "${section}")`);
     const sectionsQuery = concatenate(containsSections, 'or');
 
-    const containsNames = playerConfig.name.split(' ').map(word => `contains(text(), "${word}")`);
+    const containsNames = name.split(' ').map(word => `contains(text(), "${word}")`);
     const namesQuery = concatenate(containsNames, 'or');
 
-    const ratingQueryIfNeeded = playerConfig.rating
-        ? ` and .//div[contains(text(), "${playerConfig.rating}")]`
-        : ``;
+    const ratingQueryIfNeeded = rating ? ` and .//div[contains(text(), "${rating}")]` : ``;
 
     while (true) {
         // The page is reloaded every time we put on sale a player,
@@ -80,8 +83,8 @@ const typePriceInInput = async (
     );
     await startPriceInput[0].click();
     await transferTargetsPage.waitFor(500);
-    const startPrice = String(price);
-    return startPriceInput[0].type(startPrice, {
+
+    return startPriceInput[0].type(String(price), {
         delay: 80,
     });
 };
