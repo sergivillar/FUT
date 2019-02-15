@@ -272,22 +272,40 @@ const players: PlayerConfig[] = [
         sell: {price: 1200},
     },
     {
-        name: 'Raúl García',
-        quality: SPECIAL,
-        rating: 81,
+        name: 'Rodrigo',
+        quality: GOLD,
+        rating: 84,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 700,
+            maxBidPrice: 3000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
             maxExpirationTime: 3600,
         },
         buyNow: {
-            maxBuyNowPrice: 700,
-            maxIterations: 350,
-            playersToBuy: 4,
+            maxBuyNowPrice: 3000,
+            maxIterations: 150,
+            playersToBuy: 5,
         },
-        sell: {price: 1200},
+        sell: {price: 100},
+    },
+    {
+        name: 'Marco Verratti',
+        quality: GOLD,
+        rating: 86,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 12000,
+            minBuyNowPrice: 0,
+            maxBuyNowPrice: 0,
+            maxExpirationTime: 3600,
+        },
+        buyNow: {
+            maxBuyNowPrice: 3000,
+            maxIterations: 150,
+            playersToBuy: 5,
+        },
+        sell: {price: 100},
     },
 ];
 
