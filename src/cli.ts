@@ -20,64 +20,64 @@ export const getMenuAction = async (): Promise<MENU_ACTION> => {
     return menuAction;
 };
 
-export const loadPlayerConfig = async (): Promise<PlayerConfig> => {
+export const loadPlayerConfig = async (): Promise<PlayerConfig[]> => {
     const playersNames = playersConfig.map(({name}) => name).sort((lhs, rhs) => lhs.localeCompare(rhs));
-    const selectedPlayerName = await selectPlayerName(playersNames);
-    const selectedPlayer = playersConfig.find(({name}) => name === selectedPlayerName) as PlayerConfig;
-    printPlayerConfig(selectedPlayer);
-    return selectedPlayer;
+    const selectedPlayersName = await selectPlayersName(playersNames);
+    const selectedPlayers = playersConfig.filter(({name}) => selectedPlayersName.includes(name));
+    printPlayersConfig(selectedPlayers);
+    return selectedPlayers;
 };
 
-const selectPlayerName = async (names: string[]): Promise<string> => {
-    const {configFile} = await inquirer.prompt([
+const selectPlayersName = async (names: string[]): Promise<string[]> => {
+    const {playersName} = await inquirer.prompt([
         {
-            type: 'list',
-            name: 'configFile',
-            message: 'Which file config do you want to execute?',
+            type: 'checkbox',
+            name: 'playersName',
+            message: 'Select at least one player',
             choices: names,
         },
     ]);
 
-    return configFile;
+    return playersName;
 };
 
-const printPlayerConfig = ({name, rating, quality, bid, buyNow, sell}: PlayerConfig) => {
-    console.log('\n');
-    console.log(chalk.bold(`Player name: ${name}`));
+const printPlayersConfig = (players: PlayerConfig[]) => {
+    for (const {name, rating, quality, bid, buyNow, sell} of players) {
+        console.log('\n');
+        console.log(chalk.bold(`Player name: ${name}`));
 
-    if (rating) {
-        console.log(`Rating: ${rating}`);
+        if (rating) {
+            console.log(`Rating: ${rating}`);
+        }
+
+        if (quality) {
+            console.log(`Player quality: ${quality}`);
+        }
+
+        if (bid) {
+            console.log(chalk.underline('Bids config') + ':');
+            console.log(`  - Min bid price: ${bid.minBidPrice}`);
+            console.log(`  - Max bid price: ${bid.maxBidPrice}`);
+            console.log(`  - Min buy now price: ${bid.minBuyNowPrice}`);
+            console.log(`  - Max buy now price: ${bid.maxBuyNowPrice}`);
+            console.log(`  - Max expiration time (seconds): ${bid.maxExpirationTime}`);
+        }
+
+        if (buyNow) {
+            console.log(chalk.underline('Buy now config') + ':');
+            console.log(`  - Min bid price: ${buyNow.minBidPrice}`);
+            console.log(`  - Max bid price: ${buyNow.maxBidPrice}`);
+            console.log(`  - Min buy now price: ${buyNow.minBuyNowPrice}`);
+            console.log(`  - Max buy now price: ${buyNow.maxBuyNowPrice}`);
+            console.log(`  - Max iterations: ${buyNow.maxIterations}`);
+            console.log(`  - Players to buy: ${buyNow.playersToBuy}`);
+        }
+
+        if (sell) {
+            console.log(chalk.underline('Sell config') + ':');
+            console.log(`  - Price: ${sell.price}`);
+        }
     }
-
-    if (quality) {
-        console.log(`Player quality: ${quality}`);
-    }
-
-    if (bid) {
-        console.log(chalk.underline('Bids config') + ':');
-        console.log(`  - Min bid price: ${bid.minBidPrice}`);
-        console.log(`  - Max bid price: ${bid.maxBidPrice}`);
-        console.log(`  - Min buy now price: ${bid.minBuyNowPrice}`);
-        console.log(`  - Max buy now price: ${bid.maxBuyNowPrice}`);
-        console.log(`  - Max expiration time (seconds): ${bid.maxExpirationTime}`);
-    }
-
-    if (buyNow) {
-        console.log(chalk.underline('Buy now config') + ':');
-        console.log(`  - Min bid price: ${buyNow.minBidPrice}`);
-        console.log(`  - Max bid price: ${buyNow.maxBidPrice}`);
-        console.log(`  - Min buy now price: ${buyNow.minBuyNowPrice}`);
-        console.log(`  - Max buy now price: ${buyNow.maxBuyNowPrice}`);
-        console.log(`  - Max iterations: ${buyNow.maxIterations}`);
-        console.log(`  - Players to buy: ${buyNow.playersToBuy}`);
-    }
-
-    if (sell) {
-        console.log(chalk.underline('Sell config') + ':');
-        console.log(`  - Price: ${sell.price}`);
-    }
-
-    console.log('\n');
 };
 
 export const getConfigOperation = async ({bid, buyNow, sell, name}: PlayerConfig): Promise<OPERATION> => {
