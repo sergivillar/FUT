@@ -361,7 +361,6 @@ const players: PlayerConfig[] = [
         },
         sell: {price: 100},
     },
-
     {
         name: 'Isco',
         quality: GOLD,
@@ -379,6 +378,24 @@ const players: PlayerConfig[] = [
             playersToBuy: 1,
         },
         sell: {price: 100},
+    },
+    {
+        name: 'Morgan Sanson',
+        quality: GOLD,
+        rating: 80,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 350,
+            minBuyNowPrice: 0,
+            maxBuyNowPrice: 0,
+            maxExpirationTime: 8600,
+        },
+        buyNow: {
+            maxBuyNowPrice: 350,
+            maxIterations: 150,
+            playersToBuy: 1,
+        },
+        sell: {price: 1200},
     },
 ];
 
