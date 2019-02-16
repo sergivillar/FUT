@@ -10,14 +10,13 @@ const players: PlayerConfig[] = [
             maxBidPrice: 2900,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
+            maxExpirationTime: 240,
         },
         buyNow: {
             maxBuyNowPrice: 3000,
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Carvajal',
@@ -28,14 +27,13 @@ const players: PlayerConfig[] = [
             maxBidPrice: 3000,
             minBuyNowPrice: 0,
             maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
+            maxExpirationTime: 120,
         },
         buyNow: {
             maxBuyNowPrice: 3000,
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Koke',
@@ -53,7 +51,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Marco Asensio',
@@ -71,7 +68,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Miranda',
@@ -89,7 +85,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Saúl',
@@ -107,7 +102,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Pizzi',
@@ -125,115 +119,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
-    },
-    {
-        name: 'Emmanuel Adebayor',
-        quality: GOLD,
-        rating: 79,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 350,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 350,
-            playersToBuy: 1,
-        },
-        sell: {price: 1100},
-    },
-    {
-        name: 'Igor Akinfeev',
-        quality: SPECIAL,
-        rating: 81,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 350,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 350,
-            playersToBuy: 1,
-        },
-        sell: {price: 1500},
-    },
-    {
-        name: 'Sébastien Corchia',
-        quality: GOLD,
-        rating: 75,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 350,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 350,
-            playersToBuy: 1,
-        },
-        sell: {price: 850},
-    },
-    {
-        name: 'Samuel Gigot',
-        quality: GOLD,
-        rating: 76,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 350,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 350,
-            playersToBuy: 1,
-        },
-        sell: {price: 500000},
-    },
-    {
-        name: 'Soares',
-        quality: GOLD,
-        rating: 79,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 700,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 700,
-            playersToBuy: 1,
-        },
-        sell: {price: 500000},
-    },
-    {
-        name: 'Jorge Meré',
-        quality: GOLD,
-        rating: 77,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 350,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 0,
-            maxIterations: 350,
-            playersToBuy: 1,
-        },
-        sell: {price: 500000},
     },
     {
         name: 'Lucas Hernández',
@@ -254,24 +139,6 @@ const players: PlayerConfig[] = [
         sell: {price: 6000},
     },
     {
-        name: 'Raúl García',
-        quality: GOLD,
-        rating: 81,
-        bid: {
-            minBidPrice: 0,
-            maxBidPrice: 700,
-            minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 3600,
-        },
-        buyNow: {
-            maxBuyNowPrice: 700,
-            maxIterations: 350,
-            playersToBuy: 4,
-        },
-        sell: {price: 1200},
-    },
-    {
         name: 'Rodrigo',
         quality: GOLD,
         rating: 84,
@@ -287,7 +154,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 5,
         },
-        sell: {price: 100},
     },
     {
         name: 'Marco Verratti',
@@ -305,7 +171,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 2,
         },
-        sell: {price: 100},
     },
     {
         name: 'Keylor Navas',
@@ -323,7 +188,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 2,
         },
-        sell: {price: 100},
     },
     {
         name: 'Ciro Immobile',
@@ -341,7 +205,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 2,
         },
-        sell: {price: 100},
     },
     {
         name: 'Nicolás Otamendi',
@@ -359,7 +222,6 @@ const players: PlayerConfig[] = [
             maxIterations: 150,
             playersToBuy: 2,
         },
-        sell: {price: 100},
     },
     {
         name: 'Isco',
@@ -373,29 +235,37 @@ const players: PlayerConfig[] = [
             maxExpirationTime: 3600,
         },
         buyNow: {
-            maxBuyNowPrice: 40000,
+            maxBuyNowPrice: 42500,
             maxIterations: 150,
             playersToBuy: 1,
         },
-        sell: {price: 100},
     },
     {
-        name: 'Morgan Sanson',
+        name: 'Felipe Anderson',
         quality: GOLD,
-        rating: 80,
+        rating: 84,
         bid: {
             minBidPrice: 0,
-            maxBidPrice: 350,
+            maxBidPrice: 12000,
             minBuyNowPrice: 0,
-            maxBuyNowPrice: 0,
-            maxExpirationTime: 8600,
+            maxBuyNowPrice: 22000,
+            maxExpirationTime: 3600,
         },
         buyNow: {
-            maxBuyNowPrice: 350,
+            maxBuyNowPrice: 4000,
             maxIterations: 150,
             playersToBuy: 1,
         },
-        sell: {price: 1200},
+    },
+    {
+        name: 'Takashi Inui',
+        quality: SPECIAL,
+        rating: 80,
+        buyNow: {
+            maxBuyNowPrice: 13750,
+            maxIterations: 175,
+            playersToBuy: 2,
+        },
     },
 ];
 

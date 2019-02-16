@@ -1,11 +1,10 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import playersConfig from '../player-configs/players';
 import {PlayerConfig, OPERATION, BID, BUY_NOW, SELL} from './models';
 
-export const LOAD_PLAYER_CONFIG = 'Load player config';
-export const EXIT = 'Exit';
-export type MENU_ACTION = typeof EXIT | typeof LOAD_PLAYER_CONFIG;
+export const LOAD_LIST = 'Load list';
+export const LOAD_PLAYERS = 'Load player';
+export type MENU_ACTION = typeof LOAD_LIST | typeof LOAD_PLAYERS;
 
 export const getMenuAction = async (): Promise<MENU_ACTION> => {
     const {menuAction} = await inquirer.prompt([
@@ -13,14 +12,22 @@ export const getMenuAction = async (): Promise<MENU_ACTION> => {
             type: 'list',
             name: 'menuAction',
             message: 'What do you want to do?',
-            choices: [LOAD_PLAYER_CONFIG, EXIT],
+            choices: [LOAD_LIST, LOAD_PLAYERS],
         },
     ]);
 
     return menuAction;
 };
 
-export const loadPlayerConfig = async (): Promise<PlayerConfig[]> => {
+export const loadPlayersConfig = async (mode: MENU_ACTION): Promise<PlayerConfig[]> => {
+    let playersConfig: PlayerConfig[] = [];
+
+    if (mode === LOAD_LIST) {
+        playersConfig = require('../player-configs/list').default;
+    } else if (mode === LOAD_PLAYERS) {
+        playersConfig = require('../player-configs/players').default;
+    }
+
     const playersNames = playersConfig.map(({name}) => name).sort((lhs, rhs) => lhs.localeCompare(rhs));
     const selectedPlayersName = await selectPlayersName(playersNames);
     const selectedPlayers = playersConfig.filter(({name}) => selectedPlayersName.includes(name));
@@ -80,16 +87,16 @@ const printPlayersConfig = (players: PlayerConfig[]) => {
     }
 };
 
-export const getConfigOperation = async ({bid, buyNow, sell, name}: PlayerConfig): Promise<OPERATION> => {
+export const getConfigOperation = async (players: PlayerConfig[]): Promise<OPERATION> => {
     const operations = [];
 
-    if (bid) {
+    if (players.every(({bid}) => !!bid)) {
         operations.push(BID);
     }
-    if (buyNow) {
+    if (players.every(({buyNow}) => !!buyNow)) {
         operations.push(BUY_NOW);
     }
-    if (sell) {
+    if (players.every(({sell}) => !!sell)) {
         operations.push(SELL);
     }
 

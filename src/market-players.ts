@@ -26,11 +26,10 @@ export const buyPlayer = async (page: Page, rating?: number) => {
     try {
         if (rating) {
             players = await page.$x(
-                  `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${rating})]]`
-              );
-        }
-        else {
-            players = await page.$$('.listFUTItem')    
+                `//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${rating})]]`
+            );
+        } else {
+            players = await page.$$('.listFUTItem');
         }
 
         if (players.length === 0) {
@@ -72,7 +71,7 @@ export const buyPlayer = async (page: Page, rating?: number) => {
         console.log('Woops. Something went wrong');
         console.log(e);
         if (rating) {
-           console.log(rating);
+            console.log(rating);
         }
         console.log(`//li[contains(@class, "listFUTItem") and .//div[contains(text() , ${rating})]]`);
         console.log(players);
@@ -83,17 +82,11 @@ export const bidPlayer = async (
     page: Page,
     maxBidPrice: number,
     maxExpirationTime: number,
-    rating?: number,
-) => {
-    let players;
-    if (rating) {
-        players = await page.$x(
-            `//li[contains(@class, "listFUTItem") and not(contains(@class, "highest-bid")) and not(contains(@class, "expired")) and .//div[contains(text() , "${rating}")]]`
-        );
-    }
-    else {
-        players = await page.$$('.listFUTItem:not(.expired):not(.highest-bid)')
-    }
+    rating: number
+): Promise<boolean> => {
+    const players = await page.$x(
+        `//li[contains(@class, "listFUTItem") and not(contains(@class, "highest-bid")) and not(contains(@class, "expired")) and .//div[contains(text() , "${rating}")]]`
+    );
 
     for (const player of players) {
         await player.click();
@@ -116,17 +109,25 @@ export const bidPlayer = async (
         )).jsonValue()) as string;
         const expireTimeInSeconds = getSecondsFromTime(expiredTimeText);
 
-        if (!expireTimeInSeconds || expireTimeInSeconds > maxExpirationTime || nextBidNumber > maxBidPrice) {
-            await page.waitFor(getRandomAwaitTime(350, 550));
+        if (!expireTimeInSeconds) {
             continue;
         }
 
-        await page.waitFor(400);
+        if (nextBidNumber > maxBidPrice) {
+            await page.waitFor(getRandomAwaitTime(350, 450));
+            continue;
+        }
+
+        if (expireTimeInSeconds > maxExpirationTime) {
+            return false;
+        }
+
+        await page.waitFor(350);
 
         await bidButtonClick(page);
 
-        await page.waitFor(600);
-
-        // const playerBid = await page.$('.won .player');
+        await page.waitFor(400);
     }
+
+    return true;
 };
