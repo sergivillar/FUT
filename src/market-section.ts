@@ -21,13 +21,15 @@ export const deletePlayerInput = async (page: Page) => {
     await page.waitFor(250);
 };
 
-export const selectPlayer = async (page: Page, playerName: string): Promise<any> => {
+export const selectPlayer = async (page: Page, playerName: string, rating: number): Promise<any> => {
     await page.waitFor(getRandomAwaitTime() * 1.5);
 
-    const selectPlayerButton = await page.waitForXPath(`//span[contains(text(), "${playerName}")]`);
+    const selectPlayerButton = await page.waitForXPath(
+        `//span[contains(text(), "${playerName}")]/following-sibling::span[contains(text(),"${rating}")]`
+    );
 
     if (!selectPlayerButton) {
-        return await selectPlayer(page, playerName);
+        return await selectPlayer(page, playerName, rating);
     }
 
     await selectPlayerButton.asElement().click();
