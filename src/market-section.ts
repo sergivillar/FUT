@@ -1,17 +1,24 @@
 import {Page} from 'puppeteer';
 import {getRandomAwaitTime} from './utils';
-import { PLAYERS_QUALITY } from './models';
+import {PLAYERS_QUALITY} from './models';
 
 export const typePlayerOnInput = async (page: Page, playerName: string) => {
     await page.waitFor(getRandomAwaitTime());
 
     await page.click('input[placeholder="Type Player Name"]');
 
-    await page.waitFor(500);
+    await page.waitFor(250);
 
     await page.type('input[placeholder="Type Player Name"]', playerName, {
         delay: 80,
     });
+};
+
+export const deletePlayerInput = async (page: Page) => {
+    // @ts-ignore
+    await page.evaluate(() => (document.querySelector("input[placeholder='Type Player Name']").value = ''));
+
+    await page.waitFor(250);
 };
 
 export const selectPlayer = async (page: Page, playerName: string): Promise<any> => {
@@ -26,18 +33,30 @@ export const selectPlayer = async (page: Page, playerName: string): Promise<any>
     await selectPlayerButton.asElement().click();
 };
 
+export const checkQuality = async (page: Page, quality: PLAYERS_QUALITY) => {
+    const qualitySelected = await page.$x(
+        '//span[contains(text(), "Bronze") or contains(text(), "Silver") or contains(text(), "Gold") or contains(text(), "Special")]'
+    );
+
+    if (qualitySelected.length === 1) {
+        qualitySelected[0].click();
+    } else {
+        const qualityButton = await page.waitForXPath('//span[contains(text(), "Quality")]');
+
+        if (!qualityButton) {
+            return await changeQuality(page, quality);
+        }
+
+        await qualityButton.asElement().click();
+
+        await page.waitFor(500);
+    }
+};
+
 export const changeQuality = async (page: Page, quality: PLAYERS_QUALITY): Promise<any> => {
     await page.waitFor(getRandomAwaitTime());
 
-    const qualityButton = await page.waitForXPath('//span[contains(text(), "Quality")]');
-
-    if (!qualityButton) {
-        return await changeQuality(page, quality);
-    }
-
-    await qualityButton.asElement().click();
-
-    await page.waitFor(500);
+    await checkQuality(page, quality);
 
     const qualityOptionButton = await page.waitForXPath(`//li[contains(text(), '${quality}')]`);
 
