@@ -142,7 +142,7 @@ const executeOperation = async (operation: OPERATION, players: PlayerConfig[]) =
 
         await buyPlayer(page, rating, buyNow);
     } else if (operation === SELL) {
-        const {rating, sell} = players[0];
+        const {name, rating, sell} = players[0];
 
         if (!sell) {
             return;
