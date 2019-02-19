@@ -47,8 +47,9 @@ const massiveBidRecursion = async (page: Page, rating: number, operation: Bid) =
         await massiveBidRecursion(page, rating, operation);
     } else {
         const bidNextPage = await bidPlayer(page, operation.maxBidPrice, operation.maxExpirationTime, rating);
+        const thereAreMorePages = await page.$('.next');
 
-        if (bidNextPage) {
+        if (bidNextPage && thereAreMorePages) {
             await clickNextPageButton(page);
             await massiveBidRecursion(page, rating, operation);
         } else {

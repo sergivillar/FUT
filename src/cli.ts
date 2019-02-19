@@ -4,6 +4,7 @@ import {PlayerConfig, OPERATION, BID, BUY_NOW, SELL} from './models';
 
 export const LOAD_LIST = 'Load list';
 export const LOAD_PLAYERS = 'Load player';
+export const LOAD_UCL_UPS = 'Load investments for ups of UCL cards';
 export type MENU_ACTION = typeof LOAD_LIST | typeof LOAD_PLAYERS;
 
 export const getMenuAction = async (): Promise<MENU_ACTION> => {
@@ -12,7 +13,7 @@ export const getMenuAction = async (): Promise<MENU_ACTION> => {
             type: 'list',
             name: 'menuAction',
             message: 'What do you want to do?',
-            choices: [LOAD_LIST, LOAD_PLAYERS],
+            choices: [LOAD_LIST, LOAD_PLAYERS, LOAD_UCL_UPS],
         },
     ]);
 
@@ -26,6 +27,8 @@ export const loadPlayersConfig = async (mode: MENU_ACTION): Promise<PlayerConfig
         playersConfig = require('../player-configs/list').default;
     } else if (mode === LOAD_PLAYERS) {
         playersConfig = require('../player-configs/players').default;
+    } else if (mode === LOAD_UCL_UPS) {
+        playersConfig = require('../player-configs/ucl-ups').default;
     }
 
     const playersNames = playersConfig.map(({name}) => name).sort((lhs, rhs) => lhs.localeCompare(rhs));
