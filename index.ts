@@ -115,7 +115,7 @@ const executeOperation = async (operation: OPERATION, players: PlayerConfig[]) =
         await goToMarket(page);
 
         await typePlayerOnInput(page, name);
-        await selectPlayer(page, name, rating);
+        await selectPlayer(page, name);
         await deletePlayerInput(page);
 
         if (quality) {
