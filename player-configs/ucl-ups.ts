@@ -196,6 +196,21 @@ const players: PlayerConfig[] = [
             playersToBuy: 10,
         },
     },
+    {
+        name: 'Allan',
+        quality: SPECIAL,
+        rating: 83,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 25000,
+            maxExpirationTime: 180,
+        },
+        buyNow: {
+            maxBuyNowPrice: 25000,
+            maxIterations: 96,
+            playersToBuy: 10,
+        },
+    },
 ];
 
 export default players;
