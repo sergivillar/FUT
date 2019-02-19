@@ -181,6 +181,21 @@ const players: PlayerConfig[] = [
             playersToBuy: 10,
         },
     },
+    {
+        name: 'Ferland Mendy',
+        quality: SPECIAL,
+        rating: 78,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 4000,
+            maxExpirationTime: 180,
+        },
+        buyNow: {
+            maxBuyNowPrice: 4000,
+            maxIterations: 96,
+            playersToBuy: 10,
+        },
+    },
 ];
 
 export default players;
