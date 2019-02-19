@@ -151,6 +151,21 @@ const players: PlayerConfig[] = [
             playersToBuy: 10,
         },
     },
+    {
+        name: 'Mario Mandžukić',
+        quality: SPECIAL,
+        rating: 85,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 20000,
+            maxExpirationTime: 180,
+        },
+        buyNow: {
+            maxBuyNowPrice: 20000,
+            maxIterations: 96,
+            playersToBuy: 10,
+        },
+    },
 ];
 
 export default players;
