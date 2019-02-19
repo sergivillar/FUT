@@ -83,7 +83,7 @@ const executeOperation = async (operation: OPERATION, players: PlayerConfig[]) =
 
             await deletePlayerInput(page);
             await typePlayerOnInput(page, name);
-            await selectPlayer(page, name, rating);
+            await selectPlayer(page, name);
 
             if (!bid) {
                 return;
