@@ -166,6 +166,21 @@ const players: PlayerConfig[] = [
             playersToBuy: 10,
         },
     },
+    {
+        name: 'Tanguy Ndombele',
+        quality: SPECIAL,
+        rating: 79,
+        bid: {
+            minBidPrice: 0,
+            maxBidPrice: 3500,
+            maxExpirationTime: 180,
+        },
+        buyNow: {
+            maxBuyNowPrice: 3500,
+            maxIterations: 96,
+            playersToBuy: 10,
+        },
+    },
 ];
 
 export default players;
